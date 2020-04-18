@@ -44,6 +44,7 @@ class Game:
     def render(self):
         self.screen.fill((255, 255, 255))
         self.map.render()
+        self.player.render()
         self.allSprites.draw(self.screen)
         self.window.render()
 
