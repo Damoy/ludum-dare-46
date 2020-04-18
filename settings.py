@@ -1,2 +1,0 @@
-TilesSize = 16
-

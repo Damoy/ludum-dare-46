@@ -1,11 +1,11 @@
 import pygame
 
-from LevelGeneration import *
+from levelGeneration import *
 from window import Window
 import sprites
 
 import random
-from Tiles import Tile
+from tiles import Tile
 
 TILE_SIZE = 16
 
@@ -72,7 +72,7 @@ class Board:
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
-            newRoom = rooms[randint(0,len(rooms) - 1)]()
+            newRoom = rooms[randint(0, len(rooms) - 1)]()
 
             possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                            ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in
@@ -109,12 +109,8 @@ class Board:
         pass
 
     def render(self):
-        #self.window.get().fill(self.tilesBank['grass'].get_at((0, 0)))
-        #self.tilesGroup.draw(self.window.get())
-        #print(self.boardGrid);
         for line in self.boardGrid:
             for col in line:
-                print(col)
                 col.render(self.window.get())
         pass
 

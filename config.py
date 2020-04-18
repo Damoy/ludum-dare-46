@@ -1,1 +1,2 @@
 FPS = 120
+TILESIZE = 16

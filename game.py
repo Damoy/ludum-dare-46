@@ -18,7 +18,6 @@ class Game:
         self.isRunning = False
         self.textures = sprites.load(os.path.join('res', 'graphics', 'textures.png'))
         self.spriteBank = sprites.loadSpriteBank(self.textures)
-
         self.map = Board(self.window, self.textures, self.spriteBank)
         self.map.initBoard(10, 10);
         self.allSprites = sprites.GameSpriteGroup()

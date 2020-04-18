@@ -1,6 +1,6 @@
 import pygame
-import Tiles
-import settings
+import tiles
+import config
 from enum import Enum
 from random import randint
 import sprites
@@ -31,7 +31,7 @@ class GameRoom:
     def generateLevel(self, loadedRessources: dict):
         for x in range(self.size):
             for y in range(self.size):
-                print(x)
+                pass
 
     def render(self,window):
         self.tilesGroup.draw(window)
@@ -44,19 +44,19 @@ class BasicRoom(GameRoom):
     def __init__(self,size, line, column, width, height):
         GameRoom.__init__(self)
         self.size = 0
-        self.xStart = settings.TilesSize * width * column;
-        self.yStart = settings.TilesSize * height * line
+        self.xStart = config.TILESIZE * width * column;
+        self.yStart = config.TILESIZE * height * line
 
-        self.tilesToGenerate.append(Tiles.GrassTile);
+        self.tilesToGenerate.append(tiles.GrassTile);
         self.size = size;
 
     def generateLevel(self, loadedRessources: dict):
-        #print("Level Generation")
-        #print(self.yStart);
-        #print(self.xStart);
+        # ("Level Generation")
+        # print(self.yStart);
+        # print(self.xStart);
         self.tilesGroup = sprites.GameSpriteGroup()
         for x in range(self. size):
             for y in range(self.size):
-                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](loadedRessources, self.tilesGroup, self.xStart + x * settings.TilesSize, self.yStart + y * settings.TilesSize)
+                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE, self.yStart + y * config.TILESIZE)
                 self.generatedTiles.append(tile)
                 self.tiles.append(tile)

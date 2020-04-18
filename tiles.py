@@ -11,9 +11,6 @@ class Tile(sprites.GameSprite):
 class GrassTile(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y):
         #print(loadedRessources)
-        print("Grass Tiles pos")
-        print(x)
-        print(y)
         Tile.__init__(self, loadedRessources['fullTree'], group, x, y)
 
         # print("x:", x, ";y:", y)
