@@ -15,20 +15,24 @@ class Adjacency(Enum):
 
 
 class GameRoom:
-    def __init__(self, textures: pygame.image):
+    def __init__(self, textures: pygame.image, size, line, column, width, height):
         self.textures = textures
         self.fixedTiles = []
         self.generatedTiles = []
         self.tiles = []
-        self.size = 0
+        self.size = size
+        self.line = line
+        self.column = column
+        self.width = width * config.TILESIZE
+        self.height = height * config.TILESIZE
         self.tilesToGenerate = []
         self.enemiesToGenerate = {}
         self.itemsToGenerate = {}
         self.enemies = sprites.GameSpriteGroup()
         self.items = []
         self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM, Adjacency.LEFT, Adjacency.RIGHT]
-        self.xStart = 0
-        self.yStart = 0
+        self.xStart = config.TILESIZE * width * column
+        self.yStart = config.TILESIZE * height * line
         self.tilesGroup = None
 
     def generateLevel(self, loadedRessources: dict):
@@ -49,10 +53,10 @@ class GameRoom:
             self.enemies.update()
 
     def getRandomX(self):
-        return 0
+        return randint(0, self.width - config.TILESIZE)
 
     def getRandomY(self):
-        return 0
+        return randint(0, self.height - config.TILESIZE)
 
     def buildMobs(self):
         pass
@@ -66,14 +70,9 @@ class GameRoom:
 class BasicRoom(GameRoom):
     #Todo rename cette
     def __init__(self, textures: pygame.image, size, line, column, width, height):
-        GameRoom.__init__(self, textures)
-        self.size = 0
-        self.xStart = config.TILESIZE * width * column;
-        self.yStart = config.TILESIZE * height * line
-
-        self.tilesToGenerate.append(tiles.GrassTile);
-        self.tilesToGenerate.append(tiles.TreeTiles);
-        self.size = size;
+        GameRoom.__init__(self, textures, size, line, column, width, height)
+        self.tilesToGenerate.append(tiles.GrassTile)
+        self.tilesToGenerate.append(tiles.TreeTiles)
         self.buildMobs()
 
     def buildMobs(self):
@@ -97,7 +96,7 @@ class BasicRoom(GameRoom):
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
             for nb in range(self.enemiesToGenerate[mobClass]):
-                x = self.getRandomX() # TODO
+                x = self.getRandomX()
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
