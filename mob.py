@@ -19,7 +19,6 @@ class Mob(sprites.GameSprite):
         return None
 
     def update(self):
-        print(self.mark)
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 

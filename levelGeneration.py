@@ -53,10 +53,10 @@ class GameRoom:
             self.enemies.update()
 
     def getRandomX(self):
-        return randint(0, self.width - config.TILESIZE)
+        return randint(self.xStart, self.xStart + self.width - config.TILESIZE)
 
     def getRandomY(self):
-        return randint(0, self.height - config.TILESIZE)
+        return randint(self.yStart, self.yStart + self.height - config.TILESIZE)
 
     def buildMobs(self):
         pass
@@ -100,3 +100,4 @@ class BasicRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
+        print(len(self.enemies))
