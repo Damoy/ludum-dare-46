@@ -32,7 +32,28 @@ class Player(sprites.GameSprite):
         self.cdDashTickCounter = gameTime.TickCounter(config.FPS >> 1, False)
 
     def update(self):
+
         self.handleInput()
+        if self.x - self.mark.getX() > self.screen.get_width() * 0.70:
+            print("a droit")
+            offset = self.x - self.mark.getX() - self.screen.get_width() * 0.70
+            self.mark.x += offset
+
+        elif self.x - self.mark.getX() < self.screen.get_width() * 0.2:
+            print("a gauche")
+            offset = self.x - self.mark.getX() - self.screen.get_width() * 0.20
+            self.mark.x += offset
+
+        if self.y - self.mark.getY() < self.screen.get_height() * 0.1:
+            print("en haut")
+            offset = self.y - self.mark.getY() - self.screen.get_height() * 0.10
+            self.mark.y += offset
+
+        elif self.y - self.mark.getY() > self.screen.get_height() * 0.8:
+            print("en bas")
+            offset = self.y - self.mark.getY() - self.screen.get_height() * 0.80
+            self.mark.y += offset
+
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 

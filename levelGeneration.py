@@ -34,11 +34,11 @@ class GameRoom:
             for y in range(self.size):
                 pass
 
-    def render(self,window):
+    def render(self, window):
         self.tilesGroup.draw(window)
 
     def update(self):
-        pass
+        self.tilesGroup.update();
 
 
 class BasicRoom(GameRoom):

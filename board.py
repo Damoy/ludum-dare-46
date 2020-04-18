@@ -12,7 +12,7 @@ TILE_SIZE = 16
 
 class Board:
     def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark):
-        self.mark = mark;
+        self.mark = mark
         self.window = window
         self.textures = textures
         self.rows = window.heigthScaled // TILE_SIZE
@@ -25,18 +25,18 @@ class Board:
 
 
     def initBoard(self, width, height):
-        self.boardGrid = [[None for x in range(width)] for y in range(height)];
+        self.boardGrid = [[None for x in range(width)] for y in range(height)]
         v = 0
         for y in range(width):
             v += 1
             for x in range(height):
-                room = self.generateRoom(y, x, width, height);
-                self.boardGrid[x][y] = room;
+                room = self.generateRoom(y, x, width, height)
+                self.boardGrid[x][y] = room
 
     def generateRoom(self, line, column, width, height):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [BasicRoom];
+        rooms = [BasicRoom]
         newRoom = rooms[randint(0, len(rooms) - 1)](10, line, column, width, height)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
@@ -55,11 +55,9 @@ class Board:
                          ((column == len(self.boardGrid[0]) - 1) or self.boardGrid[line][column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies )
                          or not (Adjacency.RIGHT in newRoom.adjacencies))
 
-
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
             newRoom = rooms[randint(0, len(rooms) - 1)]()
-
             possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                            ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in
                             self.boardGrid[line - 1][column].adjacencies)
@@ -81,7 +79,7 @@ class Board:
                                  column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies)
                              or not (Adjacency.RIGHT in newRoom.adjacencies))
 
-        newRoom.generateLevel(self.tilesBank,self.mark)
+        newRoom.generateLevel(self.tilesBank, self.mark)
         return newRoom;
 
 
@@ -97,6 +95,8 @@ class Board:
     def render(self):
         for line in self.boardGrid:
             for col in line:
-                col.render(self.window.get())
-        pass
+                if col.xStart - self.mark.x < config.WIDTH or col.xStart - self.mark.x < - 100:
+                    col.render(self.window.get())
+                    col.update()
+
 

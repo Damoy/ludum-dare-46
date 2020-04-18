@@ -13,7 +13,7 @@ class Game:
     def __init__(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1' # to center window
         pygame.init()
-        self.window = Window("Game", 912, 672, 3, flags=0) # [300, 226]
+        self.window = Window("Game", config.HEIGHT, config.WIDTH, 3, flags=0) # [300, 226]
         self.screen = self.window.get()
         self.clock = pygame.time.Clock()
         self.isRunning = False
