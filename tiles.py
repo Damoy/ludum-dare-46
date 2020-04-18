@@ -3,6 +3,7 @@ import pygame
 import mark
 from random import randint
 
+
 class Tile(sprites.GameSprite):
     def __init__(self, image: pygame.image, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
         sprites.GameSprite.__init__(self, image, group, x, y)
@@ -38,8 +39,25 @@ class FlowerGrassTile(Tile):
 
 class TreeTiles(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y,mark:mark.Mark):
+        Tile.__init__(self, loadedRessources['fullTree'], group, x, y,mark)
 
-        Tile.__init__(self, loadedRessources['tiles']['fullTree'], group, x, y,mark)
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+
+class FloorTiles(Tile):
+    def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+        Tile.__init__(self, loadedRessources['grassPlant'][0], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+
+class WallTiles(Tile):
+    def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+        Tile.__init__(self, loadedRessources['grassPlant'][1], group, x, y, mark)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()

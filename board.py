@@ -36,7 +36,7 @@ class Board:
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [BasicRoom,TreeRoom,TreeRoom];
+        rooms = [CorridorWallRoom,CossWallRoom,CorridorWallRoom];
         newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
@@ -58,7 +58,7 @@ class Board:
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
-            newRoom = rooms[randint(0, len(rooms) - 1)]()
+            newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
             possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                            ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in
@@ -75,9 +75,8 @@ class Board:
                              self.boardGrid[line][column - 1].adjacencies)
                             or not (Adjacency.LEFT in newRoom.adjacencies))
 
-            # print(self.boardGrid)
             possibleRight = (Adjacency.RIGHT in newRoom.adjacencies and
-                             ((column == len(self.boardGrid[0])) or self.boardGrid[line][
+                             ((column == len(self.boardGrid[0]) - 1) or self.boardGrid[line][
                                  column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies)
                              or not (Adjacency.RIGHT in newRoom.adjacencies))
 

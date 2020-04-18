@@ -71,8 +71,8 @@ def loadSpriteBank(textures: pygame.image):
     tilesBank['overlapTree'] = subImage(textures, 193, 1, 16, 32)
 
     grassPlantTiles = []
-    grassPlantTiles.append(subImage(textures, 210, 18, 14, 13))
-    grassPlantTiles.append(subImage(textures, 226, 17, 14, 14))
+    grassPlantTiles.append(subImage(textures, 210, 18, 16, 16))
+    grassPlantTiles.append(subImage(textures, 226, 17, 16, 16))
     tilesBank['grassPlant'] = grassPlantTiles
 
     rockTiles = []

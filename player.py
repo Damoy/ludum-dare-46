@@ -8,6 +8,7 @@ import gameTime
 import mark
 
 class Player(sprites.GameSprite):
+
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict, mark: mark):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
@@ -34,22 +35,6 @@ class Player(sprites.GameSprite):
     def update(self):
 
         self.handleInput()
-        if self.x - self.mark.getX() > self.screen.get_width() * 0.70:
-            offset = self.x - self.mark.getX() - self.screen.get_width() * 0.70
-            self.mark.x += offset
-
-        elif self.x - self.mark.getX() < self.screen.get_width() * 0.2:
-            offset = self.x - self.mark.getX() - self.screen.get_width() * 0.20
-            self.mark.x += offset
-
-        if self.y - self.mark.getY() < self.screen.get_height() * 0.1:
-            offset = self.y - self.mark.getY() - self.screen.get_height() * 0.10
-            self.mark.y += offset
-
-        elif self.y - self.mark.getY() > self.screen.get_height() * 0.8:
-            print("coucou")
-            offset = self.y - self.mark.getY() - self.screen.get_height() * 0.80
-            self.mark.y += offset
 
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
@@ -59,13 +44,11 @@ class Player(sprites.GameSprite):
             if event.type == pygame.QUIT:
                 self.userEnded = True
                 return
-
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_ESCAPE]:
             self.userEnded = True
             return
-
         self.move()
 
     def updateCdDashTickCounter(self):
