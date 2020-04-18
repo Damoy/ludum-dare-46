@@ -4,6 +4,7 @@ import pygame
 from player import Player
 from window import Window
 from board import Board
+from mark import Mark
 import sprites
 import config
 
@@ -18,10 +19,11 @@ class Game:
         self.isRunning = False
         self.textures = sprites.load(os.path.join('res', 'graphics', 'textures.png'))
         self.spriteBank = sprites.loadSpriteBank(self.textures)
-        self.map = Board(self.window, self.textures, self.spriteBank)
+        self.mark = Mark(0, 0)
+        self.map = Board(self.window, self.textures, self.spriteBank, self.mark)
         self.map.initBoard(10, 10);
         self.allSprites = sprites.GameSpriteGroup()
-        self.player = Player(self.window.get(), self.textures, 100, 100, self.allSprites, self.spriteBank)
+        self.player = Player(self.window.get(), self.textures, 100, 100, self.allSprites, self.spriteBank, self.mark)
 
     def gameLoop(self):
         self.isRunning = True

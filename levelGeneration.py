@@ -1,6 +1,7 @@
 import pygame
 import tiles
 import config
+import mark
 from enum import Enum
 from random import randint
 import sprites
@@ -41,22 +42,22 @@ class GameRoom:
 
 
 class BasicRoom(GameRoom):
-    def __init__(self,size, line, column, width, height):
+    #Todo rename cette
+    def __init__(self, size, line, column, width, height):
         GameRoom.__init__(self)
         self.size = 0
         self.xStart = config.TILESIZE * width * column;
         self.yStart = config.TILESIZE * height * line
 
         self.tilesToGenerate.append(tiles.GrassTile);
+        self.tilesToGenerate.append(tiles.TreeTiles);
         self.size = size;
 
-    def generateLevel(self, loadedRessources: dict):
-        # ("Level Generation")
-        # print(self.yStart);
-        # print(self.xStart);
+    def generateLevel(self, loadedRessources: dict, mark : mark.Mark):
+
         self.tilesGroup = sprites.GameSpriteGroup()
         for x in range(self. size):
             for y in range(self.size):
-                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE, self.yStart + y * config.TILESIZE)
+                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE, self.yStart + y * config.TILESIZE, mark)
                 self.generatedTiles.append(tile)
                 self.tiles.append(tile)

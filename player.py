@@ -5,15 +5,18 @@ from board import TILE_SIZE
 from movement import Direction
 import config
 import gameTime
-
+import mark
 
 class Player(sprites.GameSprite):
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict):
+                 spriteBank: dict, mark: mark):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
         self.screen = screen
+        self.mark = mark
         self.rect.x = x
         self.rect.y = y
+        self.x = x
+        self.y = y
         self.dv = 1
         self.dvDash = self.dv * 3
         self.pxMoveCount = 0
@@ -30,6 +33,8 @@ class Player(sprites.GameSprite):
 
     def update(self):
         self.handleInput()
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
 
     def handleInput(self):
         for event in pygame.event.get():
@@ -93,8 +98,8 @@ class Player(sprites.GameSprite):
 
             if not self.isDashing and dx != 0 or dy != 0:
                 self.pxMoveCount += max(abs(dx), abs(dy))
-                self.rect.x += dx
-                self.rect.y += dy
+                self.x += dx
+                self.y += dy
                 if dirUpdated:
                     self.setAnimationDirection()
                 elif self.pxMoveCount >= 16:
@@ -158,8 +163,8 @@ class Player(sprites.GameSprite):
         if dirY == Direction.DOWN:
             dy = self.dvDash
 
-        self.rect.x += dx
-        self.rect.y += dy
+        self.x += dx
+        self.y += dy
         self.pxMoveCount += max(abs(dx), abs(dy))
 
         # update dash animation
@@ -173,3 +178,5 @@ class Player(sprites.GameSprite):
             self.animation = self.walkAnimation
             self.setAnimationDirection()
             self.pxMoveCount = 0
+
+

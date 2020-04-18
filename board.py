@@ -3,7 +3,7 @@ import pygame
 from levelGeneration import *
 from window import Window
 import sprites
-
+import mark
 import random
 from tiles import Tile
 
@@ -11,7 +11,8 @@ TILE_SIZE = 16
 
 
 class Board:
-    def __init__(self, window: Window, textures: pygame.image, spriteBank: dict):
+    def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark):
+        self.mark = mark;
         self.window = window
         self.textures = textures
         self.rows = window.heigthScaled // TILE_SIZE
@@ -21,21 +22,7 @@ class Board:
         self.tilesBank = spriteBank['tiles']
         self.tilesGroup = sprites.GameSpriteGroup()
         self.boardGrid = []
-    # self.tiles = self.initTiles()
 
-    # def initTiles(self):
-    #     tiles = []
-    #     grassFlowerTiles = self.tilesBank['grassFlower']
-    #     for row in range(self.rows):
-    #         y = max(TILE_SIZE // 2, min(self.maxHeight - TILE_SIZE, row * TILE_SIZE))
-    #         tileRow = []
-    #         for col in range(self.cols):
-    #             x = max(TILE_SIZE // 2, min(self.maxWidth - TILE_SIZE, col * TILE_SIZE))
-    #             texture = self.getRandomTile(grassFlowerTiles)
-    #             tile = Tile(texture, self.tilesGroup, x, y)
-    #             tileRow.append(tile)
-    #         tiles.append(tileRow)
-    #     return tiles
 
     def initBoard(self, width, height):
         self.boardGrid = [[None for x in range(width)] for y in range(height)];
@@ -50,8 +37,7 @@ class Board:
         #TODO stuff
         #like LevelMAnager.getArray
         rooms = [BasicRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](10,line,column,width, height)
-
+        newRoom = rooms[randint(0, len(rooms) - 1)](10, line, column, width, height)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                        ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies )
@@ -95,7 +81,7 @@ class Board:
                                  column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies)
                              or not (Adjacency.RIGHT in newRoom.adjacencies))
 
-        newRoom.generateLevel(self.tilesBank)
+        newRoom.generateLevel(self.tilesBank,self.mark)
         return newRoom;
 
 
