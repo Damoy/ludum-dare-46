@@ -50,7 +50,8 @@ class GameRoom:
         if self.tilesGroup:
             self.tilesGroup.update()
         if self.enemies:
-            self.enemies.update()
+            self.enemies.update([self.xStart, self.xStart + self.width - config.TILESIZE,
+                                 self.yStart, self.yStart + self.height - config.TILESIZE])
 
     def getRandomX(self):
         return randint(self.xStart, self.xStart + self.width - config.TILESIZE)
@@ -90,9 +91,6 @@ class BasicRoom(GameRoom):
                 self.generatedTiles.append(tile)
                 self.tiles.append(tile)
 
-    # self, x, y, group: sprites.GameSpriteGroup,
-    # spriteBank: dict, mark: mark, textures: pygame.image, gameRoom: board.GameRoom
-
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
             for nb in range(self.enemiesToGenerate[mobClass]):
@@ -100,4 +98,3 @@ class BasicRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))

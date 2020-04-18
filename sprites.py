@@ -161,6 +161,17 @@ def loadSpriteBank(textures: pygame.image):
     gobelin['right'] = pygame.transform.flip(gobelin['left'], True, False).convert()
     enemiesBank['gobelin'] = gobelin
 
+    knight1 = {}
+    knight1['right'] = []
+    knight1['right'].append(subImage(textures, 4, 163, 20, 17))
+    knight1['right'].append(subImage(textures, 27, 164, 20, 16))
+    knight1['right'].append(subImage(textures, 50, 165, 20, 15))
+    knight1['right'].append(subImage(textures, 73, 164, 20, 16))
+    knight1['left'] = []
+    for frame in knight1['right']:
+        knight1['left'].append(pygame.transform.flip(frame, True, False).convert())
+    enemiesBank['knight1'] = knight1
+
     characters['player'] = playerBank
     characters['enemies'] = enemiesBank
     entitiesBank['characters'] = characters

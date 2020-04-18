@@ -36,6 +36,7 @@ class Game:
         pygame.quit()
 
     def update(self):
+        self.map.update()
         self.allSprites.update()
         if self.player.userEnded:
             self.isRunning = False

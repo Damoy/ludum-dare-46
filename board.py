@@ -85,12 +85,6 @@ class Board:
         return newRoom;
 
 
-    # def getRandomTile(self, arrs):
-    #     n = len(arrs)
-    #     row = random.randint(0, n - 1)
-    #     m = random.randint(0, len(arrs[row]) - 1)
-    #     return arrs[row][m]
-
     def update(self):
         for line in self.boardGrid:
             for col in line:
@@ -101,6 +95,5 @@ class Board:
             for col in line:
                 if col.xStart - self.mark.x < config.WIDTH or col.xStart - self.mark.x < - 100:
                     col.render(self.window.get())
-                    col.update()
 
 
