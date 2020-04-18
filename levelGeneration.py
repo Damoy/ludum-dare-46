@@ -5,6 +5,7 @@ import mark
 from enum import Enum
 from random import randint
 import sprites
+import mob
 
 class Adjacency(Enum):
     TOP = 0
