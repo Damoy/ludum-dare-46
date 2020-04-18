@@ -1,11 +1,9 @@
 import pygame
-
-from levelGeneration import *
 from window import Window
+from levelGeneration import BasicRoom, Adjacency
 import sprites
 import mark
-import random
-from tiles import Tile
+from random import randint
 
 TILE_SIZE = 16
 
@@ -19,7 +17,7 @@ class Board:
         self.cols = window.widthScaled // TILE_SIZE
         self.maxHeight = self.rows * TILE_SIZE
         self.maxWidth = self.cols * TILE_SIZE
-        self.tilesBank = spriteBank['tiles']
+        self.spriteBank = spriteBank
         self.tilesGroup = sprites.GameSpriteGroup()
         self.boardGrid = []
 
@@ -37,7 +35,7 @@ class Board:
         #TODO stuff
         #like LevelMAnager.getArray
         rooms = [BasicRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](10, line, column, width, height)
+        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, 10, line, column, width, height)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                        ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies )
@@ -58,7 +56,7 @@ class Board:
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
-            newRoom = rooms[randint(0, len(rooms) - 1)]()
+            newRoom = rooms[randint(0, len(rooms) - 1)](self.textures)
 
             possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                            ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in
@@ -81,7 +79,7 @@ class Board:
                                  column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies)
                              or not (Adjacency.RIGHT in newRoom.adjacencies))
 
-        newRoom.generateLevel(self.tilesBank,self.mark)
+        newRoom.generateLevel(self.spriteBank, self.mark)
         return newRoom;
 
 
@@ -92,7 +90,9 @@ class Board:
     #     return arrs[row][m]
 
     def update(self):
-        pass
+        for line in self.boardGrid:
+            for col in line:
+                col.update()
 
     def render(self):
         for line in self.boardGrid:
