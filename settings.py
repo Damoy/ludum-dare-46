@@ -1,0 +1,2 @@
+TilesSize = 16
+

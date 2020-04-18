@@ -26,4 +26,4 @@ class Window:
     def render(self):
         frame = pygame.transform.scale(self.scaledContent, (self.width, self.height))
         self.content.blit(frame, frame.get_rect())
-        pygame.display.update()
+        pygame.display.update();

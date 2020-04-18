@@ -1,7 +1,7 @@
 import pygame
 from sprites import GameSprite, GameSpriteGroup, subImage, loadPlayerAnimation
 
-from map import TILE_SIZE
+from board import TILE_SIZE
 from movement import Direction
 
 
