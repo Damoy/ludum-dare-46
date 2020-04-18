@@ -8,7 +8,6 @@ import gameTime
 import mark
 
 class Player(sprites.GameSprite):
-
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict, mark: mark):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
@@ -44,6 +43,7 @@ class Player(sprites.GameSprite):
             if event.type == pygame.QUIT:
                 self.userEnded = True
                 return
+
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_ESCAPE]:
@@ -103,7 +103,7 @@ class Player(sprites.GameSprite):
                 self.y += dy
                 if dirUpdated:
                     self.setAnimationDirection()
-                elif self.pxMoveCount >= 16:
+                elif self.pxMoveCount >= config.TILESIZE:
                     self.pxMoveCount = 0
                     self.updateAnimation()
 

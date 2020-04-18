@@ -21,7 +21,7 @@ class GameRoom:
         self.fixedTiles = []
         # Wall
         self.physics = [[0 for x in range(size)] for y in range(size)]
-        self.fixedWalls = []
+        self.fixedWall = []
         self.generatedTiles = []
 
         self.tiles = []
@@ -67,7 +67,8 @@ class GameRoom:
         if self.tilesGroup:
             self.tilesGroup.update()
         if self.enemies:
-            self.enemies.update()
+            self.enemies.update([self.xStart, self.xStart + self.width - config.TILESIZE,
+                                 self.yStart, self.yStart + self.height - config.TILESIZE])
 
     def getRandomX(self):
         return randint(self.xStart, self.xStart + self.width - config.TILESIZE)
@@ -98,6 +99,8 @@ class BasicRoom(GameRoom):
 
     def buildMobs(self):
         self.enemiesToGenerate[mob.Gobelin] = 1
+        self.enemiesToGenerate[mob.Knight1] = 1
+
 
     def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -114,8 +117,6 @@ class BasicRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))
-
 
 
 class TreeRoom(GameRoom):

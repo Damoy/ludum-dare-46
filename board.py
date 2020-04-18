@@ -84,16 +84,12 @@ class Board:
         return newRoom;
 
 
-    # def getRandomTile(self, arrs):
-    #     n = len(arrs)
-    #     row = random.randint(0, n - 1)
-    #     m = random.randint(0, len(arrs[row]) - 1)
-    #     return arrs[row][m]
-
     def update(self):
         for line in self.boardGrid:
             for col in line:
-                col.update()
+                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+                    col.update()
 
     def render(self):
         for line in self.boardGrid:
@@ -101,6 +97,5 @@ class Board:
                 if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
                         config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
                     col.render(self.window.get())
-                    col.update()
 
 
