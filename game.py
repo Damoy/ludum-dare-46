@@ -5,6 +5,7 @@ from player import Player
 from window import Window
 from board import Board
 import sprites
+import config
 
 
 class Game:
@@ -26,8 +27,7 @@ class Game:
     def gameLoop(self):
         self.isRunning = True
         while self.isRunning:
-            self.clock.tick(120)
-            print(pygame.mouse.get_pos())
+            self.clock.tick(config.FPS)
             self.update()
             if not self.isRunning:
                 break

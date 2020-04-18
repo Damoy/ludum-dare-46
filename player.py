@@ -1,24 +1,32 @@
 import pygame
-from sprites import GameSprite, GameSpriteGroup, subImage, loadPlayerAnimation
+import sprites
 
 from board import TILE_SIZE
 from movement import Direction
+import config
+import gameTime
 
 
-class Player(GameSprite):
-    def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: GameSpriteGroup,
+class Player(sprites.GameSprite):
+    def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict):
-        GameSprite.__init__(self, subImage(image, 0, 1, 14, 15), group)
+        sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
         self.screen = screen
         self.rect.x = x
         self.rect.y = y
         self.dv = 1
-        self.isMoving = False
+        self.dvDash = self.dv * 3
         self.pxMoveCount = 0
-        self.direction = Direction.NONE
-        self.animation = loadPlayerAnimation(spriteBank)
-        self.animation.setDirection(Direction.DOWN)
+        self.directions = {"x": Direction.LEFT, "y": Direction.DOWN}
+        self.walkAnimation = None
+        self.dashAnimation = None
+        self.loadAnimations(spriteBank)
+        self.animation = self.walkAnimation
+        self.animation.setDirection(self.directions["y"])
         self.userEnded = False
+        self.isDashing = False
+        self.canDash = True
+        self.cdDashTickCounter = gameTime.TickCounter(config.FPS >> 1, False)
 
     def update(self):
         self.handleInput()
@@ -37,30 +45,68 @@ class Player(GameSprite):
 
         self.move()
 
+    def updateCdDashTickCounter(self):
+        if self.cdDashTickCounter.hasStarted():
+            self.cdDashTickCounter.update()
+        if self.cdDashTickCounter.hasStarted() and self.cdDashTickCounter.hasReachedEnd():
+            self.canDash = True
+            self.cdDashTickCounter.reset()
+
     def move(self):
-        if self.isMoving and self.direction is not Direction.NONE:
-            self.updateMove()
+        self.updateCdDashTickCounter()
+
+        if self.isDashing:
+            self.updateDash()
         else:
+            dx = 0
+            dy = 0
+            dirX = Direction.NONE
+            dirY = Direction.NONE
+
             keys = pygame.key.get_pressed()
-            oldDirection = self.direction
             if keys[pygame.K_LEFT]:
-                self.rect.x -= self.dv
-                self.direction = Direction.LEFT
+                dx = -self.dv
+                dirX = Direction.LEFT
             if keys[pygame.K_RIGHT]:
-                self.rect.x += self.dv
-                self.direction = Direction.RIGHT
+                dx = self.dv
+                dirX = Direction.RIGHT
             if keys[pygame.K_DOWN]:
-                self.rect.y += self.dv
-                self.direction = Direction.DOWN
+                dy = self.dv
+                dirY = Direction.DOWN
             if keys[pygame.K_UP]:
-                self.rect.y -= self.dv
-                self.direction = Direction.UP
-            if self.movingKeysActivated(keys):
-                if self.direction is not oldDirection:
-                    self.animation.setDirection(self.direction)
-                    self.image = self.animation.getCurrentFrame()
-                self.isMoving = True
-                self.pxMoveCount += self.dv
+                dy = -self.dv
+                dirY = Direction.UP
+
+            dirUpdated = self.directions["x"] is not dirX or self.directions["y"] is not dirY
+            self.directions["x"] = dirX
+            self.directions["y"] = dirY
+
+            if keys[pygame.K_f] and (dx != 0 or dy != 0) and self.canDash:
+                self.isDashing = True
+                self.canDash = False
+
+            if self.isDashing:
+                self.animation = self.dashAnimation
+                self.setAnimationDirection()
+            else:
+                self.animation = self.walkAnimation
+
+            if not self.isDashing and dx != 0 or dy != 0:
+                self.pxMoveCount += max(abs(dx), abs(dy))
+                self.rect.x += dx
+                self.rect.y += dy
+                if dirUpdated:
+                    self.setAnimationDirection()
+                elif self.pxMoveCount >= 16:
+                    self.pxMoveCount = 0
+                    self.updateAnimation()
+
+    def setAnimationDirection(self):
+        if self.directions["y"] is Direction.NONE:
+            self.animation.setDirection(self.directions["x"])
+        else:
+            self.animation.setDirection(self.directions["y"])
+        self.image = self.animation.getCurrentFrame()
 
     def updateAnimation(self):
         self.animation.update()
@@ -70,22 +116,60 @@ class Player(GameSprite):
         return keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] \
             or keys[pygame.K_DOWN] or keys[pygame.K_UP]
 
-    def updateMove(self):
-        if self.direction == Direction.DOWN:
-            self.rect.y += self.dv
-        elif self.direction == Direction.LEFT:
-            self.rect.x -= self.dv
-        elif self.direction == Direction.RIGHT:
-            self.rect.x += self.dv
-        elif self.direction == Direction.UP:
-            self.rect.y -= self.dv
+    def loadAnimations(self, spriteBank: dict):
+        playerBank = spriteBank['entities']['characters']['player']
+        playerWalk = playerBank['walk']
 
-        self.pxMoveCount += self.dv
+        self.walkAnimation = sprites.DirectedAnimation(60, True)
+        for playerUpFrame in playerWalk['up']:
+            self.walkAnimation.addFrame(Direction.UP, playerUpFrame)
+        for playerDownFrame in playerWalk['down']:
+            self.walkAnimation.addFrame(Direction.DOWN, playerDownFrame)
+        for playerLeftFrame in playerWalk['left']:
+            self.walkAnimation.addFrame(Direction.LEFT, playerLeftFrame)
+        for playerRightFrame in playerWalk['right']:
+            self.walkAnimation.addFrame(Direction.RIGHT, playerRightFrame)
 
-        if self.pxMoveCount >= TILE_SIZE:
+        playerDash = playerBank['dash']
+        self.dashAnimation = sprites.DirectedAnimation(90, True)
+        for playerDownFrame in playerDash['down']:
+            self.dashAnimation.addFrame(Direction.DOWN, playerDownFrame)
+        for playerUpFrame in playerDash['up']:
+            self.dashAnimation.addFrame(Direction.UP, playerUpFrame)
+        for playerLeftFrame in playerDash['left']:
+            self.dashAnimation.addFrame(Direction.LEFT, playerLeftFrame)
+        for playerRightFrame in playerDash['right']:
+            self.dashAnimation.addFrame(Direction.RIGHT, playerRightFrame)
+
+    def updateDash(self):
+        if self.directions["x"] is Direction.NONE and self.directions["y"] is Direction.NONE:
+            return
+        dx = 0
+        dy = 0
+        dirX = self.directions["x"]
+        dirY = self.directions["y"]
+
+        if dirX == Direction.LEFT:
+            dx = -self.dvDash
+        if dirX == Direction.RIGHT:
+            dx = self.dvDash
+        if dirY == Direction.UP:
+            dy = -self.dvDash
+        if dirY == Direction.DOWN:
+            dy = self.dvDash
+
+        self.rect.x += dx
+        self.rect.y += dy
+        self.pxMoveCount += max(abs(dx), abs(dy))
+
+        # update dash animation
+        if self.pxMoveCount >= 16:
             self.updateAnimation()
-            self.endMove()
 
-    def endMove(self):
-        self.isMoving = False
-        self.pxMoveCount = 0
+        # end of dash
+        if self.pxMoveCount >= 48:
+            self.isDashing = False
+            self.cdDashTickCounter.start()
+            self.animation = self.walkAnimation
+            self.setAnimationDirection()
+            self.pxMoveCount = 0

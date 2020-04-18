@@ -51,9 +51,9 @@ class BasicRoom(GameRoom):
         self.size = size;
 
     def generateLevel(self, loadedRessources: dict):
-        print("Level Generation")
-        print(self.yStart);
-        print(self.xStart);
+        #print("Level Generation")
+        #print(self.yStart);
+        #print(self.xStart);
         self.tilesGroup = sprites.GameSpriteGroup()
         for x in range(self. size):
             for y in range(self.size):
