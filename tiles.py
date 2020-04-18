@@ -21,7 +21,16 @@ class GrassTile(Tile):
         Tile.__init__(self, loadedRessources['grass'], group, x, y,mark)
         # print("x:", x, ";y:", y)
 
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+
 class TreeTiles(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y,mark:mark.Mark):
         Tile.__init__(self, loadedRessources['fullTree'], group, x, y,mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
 
