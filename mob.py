@@ -1,10 +1,10 @@
 import pygame
 import sprites
-import mark
+from mark import Mark
 
 class Mob(sprites.GameSprite):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict, mark: mark, textures: pygame.image, startImage: pygame.image):
+                 spriteBank: dict, mark: Mark, textures: pygame.image, startImage: pygame.image):
         sprites.GameSprite.__init__(self, startImage, group)
         self.mark = mark
         self.rect.x = x
@@ -19,17 +19,18 @@ class Mob(sprites.GameSprite):
         return None
 
     def update(self):
-        pass
+        print(self.mark)
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
 
 class Gobelin(Mob):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict, mark: mark, textures: pygame.image):
+                 spriteBank: dict, mark: Mark, textures: pygame.image):
         Mob.__init__(self, x, y, group, spriteBank, mark, textures,
                      spriteBank['entities']['characters']['enemies']['gobelin']['down'])
 
     def loadAnimation(self):
         gobBank = self.spriteBank['entities']['characters']['enemies']['gobelin']
-        print(gobBank)
         anim = sprites.DirectedAnimation(120, True)
         anim.addFrame(sprites.Direction.LEFT, gobBank['left'])
         anim.addFrame(sprites.Direction.RIGHT, gobBank['right'])

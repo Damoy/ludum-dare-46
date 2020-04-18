@@ -81,7 +81,7 @@ class BasicRoom(GameRoom):
 
     def generateLevel(self, spriteBank: dict, mark : mark.Mark):
         self.generateTiles(spriteBank['tiles'], mark)
-        self.generateMobs(spriteBank)
+        self.generateMobs(spriteBank, mark)
 
     def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -94,7 +94,7 @@ class BasicRoom(GameRoom):
     # self, x, y, group: sprites.GameSpriteGroup,
     # spriteBank: dict, mark: mark, textures: pygame.image, gameRoom: board.GameRoom
 
-    def generateMobs(self, spriteBank: dict):
+    def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
             for nb in range(self.enemiesToGenerate[mobClass]):
                 x = self.getRandomX() # TODO
