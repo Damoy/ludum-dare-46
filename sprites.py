@@ -154,7 +154,15 @@ def loadSpriteBank(textures: pygame.image):
     playerBank['walk'] = playerWalk
     playerBank['dash'] = playerDash
 
+    enemiesBank = {}
+    gobelin = {}
+    gobelin['down'] = subImage(textures, 112, 33, 16, 15)
+    gobelin['left'] = subImage(textures, 129, 33, 16, 15)
+    gobelin['right'] = pygame.transform.flip(gobelin['left'], True, False).convert()
+    enemiesBank['gobelin'] = gobelin
+
     characters['player'] = playerBank
+    characters['enemies'] = enemiesBank
     entitiesBank['characters'] = characters
 
     spriteBank['tiles'] = tilesBank
