@@ -47,6 +47,7 @@ class Player(sprites.GameSprite):
             self.mark.y += offset
 
         elif self.y - self.mark.getY() > self.screen.get_height() * 0.8:
+            print("coucou")
             offset = self.y - self.mark.getY() - self.screen.get_height() * 0.80
             self.mark.y += offset
 

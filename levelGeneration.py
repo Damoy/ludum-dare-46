@@ -51,10 +51,11 @@ class GameRoom:
         self.yStart = config.TILESIZE * size * line
         self.tilesGroup = None
 
-    def generateLevel(self, loadedRessources: dict):
-        # for x in range(self.size):
-        #     for y in range(self.size):
-        pass
+    def generateLevel(self, spriteBank: dict, mark: mark.Mark):
+        self.generateTiles(spriteBank['tiles'], mark)
+        self.generateMobs(spriteBank, mark)
+        if self.nbWallToGenerate >0 :
+            self.generateWalls(spriteBank['tiles'], mark)
 
     def render(self, window):
         if self.tilesGroup:
@@ -77,26 +78,28 @@ class GameRoom:
     def buildMobs(self):
         pass
 
-    def generateTiles(self):
+    def generateTiles(self, loadedRessource: dict, mark : mark.Mark):
         pass
 
-    def generateMobs(self):
+    def generateMobs(self, loadedRessource: dict, mark : mark.Mark):
+        pass
+
+    def generateWalls(self, loadedRessource: dict, mark : mark.Mark):
         pass
 
 class BasicRoom(GameRoom):
     #Todo rename cette
-    def __init__(self, size, line, column):
-        GameRoom.__init__(self, textures: pygame.image, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column):
+
+        GameRoom.__init__(self, textures ,size, line, column)
         self.tilesToGenerate.append(tiles.GrassTile)
-        self.tilesToGenerate.append(tiles.TreeTiles)
+        self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.buildMobs()
 
     def buildMobs(self):
         self.enemiesToGenerate[mob.Gobelin] = 1
 
-    def generateLevel(self, spriteBank: dict, mark : mark.Mark):
-        self.generateTiles(spriteBank['tiles'], mark)
-        self.generateMobs(spriteBank, mark)
+
 
     def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -122,15 +125,20 @@ class BasicRoom(GameRoom):
 
 class TreeRoom(GameRoom):
     #Todo rename cette
-    def __init__(self, size, line, column):
-        GameRoom.__init__(self, size, line, column)
+    def __init__(self, textures: pygame.image,size, line, column):
+        GameRoom.__init__(self, textures,size, line, column)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 2, tiles.TreeTiles))
-        self.nbWallToGenerate = 8;
+        self.nbWallToGenerate = 8
         self.size = size;
 
-    def generateLevel(self, loadedRessources: dict, mark : mark.Mark):
+    def generateLevel(self, spriteBank: dict, mark : mark.Mark):
+        self.generateTiles(spriteBank['tiles'], mark)
+        self.generateMobs(spriteBank, mark)
+        #self.generateWalls(spriteBank, mark)
+
+    def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
         for x in range(self. size):
             for y in range(self.size):
@@ -138,6 +146,16 @@ class TreeRoom(GameRoom):
                 self.generatedTiles.append(tile)
                 self.tiles.append(tile)
 
+    def generateMobs(self, spriteBank: dict, mark: mark.Mark):
+        for mobClass in self.enemiesToGenerate:
+            for nb in range(self.enemiesToGenerate[mobClass]):
+                x = self.getRandomX()
+                y = self.getRandomY()
+                m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
+                self.enemies.add(m)
+        print(len(self.enemies))
+
+    def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
         for x in range(self.nbWallToGenerate):
             generated = False
             tryb = 0

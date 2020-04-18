@@ -24,7 +24,7 @@ class Board:
         self.boardGrid = []
 
 
-    def initBoard(self, width, height):
+    def initBoard(self, width, height,size):
         self.boardGrid = [[None for x in range(width)] for y in range(height)]
         v = 0
         for y in range(width):
@@ -36,8 +36,8 @@ class Board:
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [BasicRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, width, height)
+        rooms = [BasicRoom,TreeRoom,TreeRoom];
+        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                        ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies )
@@ -99,7 +99,9 @@ class Board:
     def render(self):
         for line in self.boardGrid:
             for col in line:
-                if col.xStart - self.mark.x < config.WIDTH or col.xStart - self.mark.x < - 100:
+                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
                     col.render(self.window.get())
+                    col.update()
 
 
