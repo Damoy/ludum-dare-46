@@ -15,30 +15,47 @@ class Adjacency(Enum):
 
 
 class GameRoom:
-    def __init__(self, textures: pygame.image, size, line, column, width, height):
+    def __init__(self, textures: pygame.image, size, line, column):
+
         self.textures = textures
         self.fixedTiles = []
+        # Wall
+        self.physics = [[0 for x in range(size)] for y in range(size)]
+        self.fixedWall = []
         self.generatedTiles = []
+
         self.tiles = []
+        self.size = size
+
         self.size = size
         self.line = line
         self.column = column
-        self.width = width * config.TILESIZE
-        self.height = height * config.TILESIZE
+        self.width = size * config.TILESIZE
+        self.height = size * config.TILESIZE
         self.tilesToGenerate = []
+
+        self.wallsToGenerate = []
+        self.nbWallToGenerate = 0
+        self.generatedWall = []
+
+
         self.enemiesToGenerate = {}
         self.itemsToGenerate = {}
         self.enemies = sprites.GameSpriteGroup()
         self.items = []
+
+
         self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM, Adjacency.LEFT, Adjacency.RIGHT]
-        self.xStart = config.TILESIZE * width * column
-        self.yStart = config.TILESIZE * height * line
+
+        self.xStart = config.TILESIZE * size * column
+        self.yStart = config.TILESIZE * size * line
         self.tilesGroup = None
 
-    def generateLevel(self, loadedRessources: dict):
-        # for x in range(self.size):
-        #     for y in range(self.size):
-        pass
+    def generateLevel(self, spriteBank: dict, mark: mark.Mark):
+        self.generateTiles(spriteBank['tiles'], mark)
+        self.generateMobs(spriteBank, mark)
+        if self.nbWallToGenerate > 0 :
+            self.generateWalls(spriteBank['tiles'], mark)
 
     def render(self, window):
         if self.tilesGroup:
@@ -62,28 +79,67 @@ class GameRoom:
     def buildMobs(self):
         pass
 
-    def generateTiles(self):
+    def generateTiles(self, loadedRessource: dict, mark : mark.Mark):
         pass
 
-    def generateMobs(self):
+    def generateMobs(self, loadedRessource: dict, mark : mark.Mark):
+        pass
+
+    def generateWalls(self, loadedRessource: dict, mark : mark.Mark):
         pass
 
 class BasicRoom(GameRoom):
     #Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column, width, height):
-        GameRoom.__init__(self, textures, size, line, column, width, height)
+    def __init__(self, textures: pygame.image, size, line, column):
+
+        GameRoom.__init__(self, textures ,size, line, column)
         self.tilesToGenerate.append(tiles.GrassTile)
-        self.tilesToGenerate.append(tiles.TreeTiles)
+        self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.buildMobs()
 
     def buildMobs(self):
         self.enemiesToGenerate[mob.Gobelin] = 1
 
+
+
+    def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
+        self.tilesGroup = sprites.GameSpriteGroup()
+        for x in range(self. size):
+            for y in range(self.size):
+                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE, self.yStart + y * config.TILESIZE, mark)
+                self.generatedTiles.append(tile)
+                self.tiles.append(tile)
+
+    # self, x, y, group: sprites.GameSpriteGroup,
+    # spriteBank: dict, mark: mark, textures: pygame.image, gameRoom: board.GameRoom
+
+    def generateMobs(self, spriteBank: dict, mark: mark.Mark):
+        for mobClass in self.enemiesToGenerate:
+            for nb in range(self.enemiesToGenerate[mobClass]):
+                x = self.getRandomX()
+                y = self.getRandomY()
+                m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
+                self.enemies.add(m)
+        print(len(self.enemies))
+
+
+
+class TreeRoom(GameRoom):
+    #Todo rename cette
+    def __init__(self, textures: pygame.image,size, line, column):
+        GameRoom.__init__(self, textures,size, line, column)
+        self.tilesToGenerate.append(tiles.GrassTile)
+        self.tilesToGenerate.append(tiles.FlowerGrassTile)
+        self.wallsToGenerate.append((1, 2, tiles.TreeTiles))
+        self.nbWallToGenerate = 8
+        self.size = size;
+
     def generateLevel(self, spriteBank: dict, mark : mark.Mark):
         self.generateTiles(spriteBank['tiles'], mark)
         self.generateMobs(spriteBank, mark)
+        self.generateWalls(spriteBank, mark)
 
-    def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
+    def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
         for x in range(self. size):
             for y in range(self.size):
@@ -98,3 +154,38 @@ class BasicRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
+        print(len(self.enemies))
+
+    def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
+        for x in range(self.nbWallToGenerate):
+            generated = False
+            tryb = 0
+            brutcap = 100
+            while not generated and tryb < brutcap:
+                tryb += 1
+                wallToGenerate = self.wallsToGenerate[randint(0, len(self.wallsToGenerate) - 1)]
+                generateCoordX = randint(2, len(self.physics) - 4)
+                generateCoordY = randint(2, len(self.physics) - 4)
+
+                #Check generation validity
+                if self.physics[generateCoordY][generateCoordX] == 0:
+                    ycheck = wallToGenerate[1];
+                    xcheck = wallToGenerate[0];
+                    res = True
+                    while ycheck >= 0:
+                        for x in range(xcheck):
+                            if self.physics[generateCoordY - ycheck][generateCoordX - x] == 1:
+                                res = False;
+                                break;
+                        ycheck -= 1;
+                    if res:
+                        ycheck = wallToGenerate[1];
+                        generated = True
+                        while ycheck >= 0:
+                            for x in range(xcheck):
+                                self.physics[generateCoordY - ycheck][generateCoordX - x] = 1
+                            ycheck -= 1
+                        tile = wallToGenerate[2](loadedRessources, self.tilesGroup, self.xStart + generateCoordX * config.TILESIZE, self.yStart + generateCoordY * config.TILESIZE, mark)
+                        self.generatedWall.append(tile)
+                        self.tiles.append(tile)
+

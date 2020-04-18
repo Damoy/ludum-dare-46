@@ -90,18 +90,18 @@ def loadSpriteBank(textures: pygame.image):
     grassFlower2.append(subImage(textures, 258, 50, 16, 16))
     grassFlower2.append(subImage(textures, 274, 50, 16, 16))
     grassFlower2.append(subImage(textures, 290, 50, 16, 16))
-    grassFlower3 = []
-    grassFlower3.append(subImage(textures, 0, 21, 7, 4))
-    grassFlower3.append(subImage(textures, 8, 21, 7, 6))
-    grassFlower3.append(subImage(textures, 16, 21, 9, 8))
-    grassFlower4 = []
-    grassFlower4.append(subImage(textures, 258, 83, 12, 12))
-    grassFlower4.append(subImage(textures, 274, 82, 14, 13))
-    grassFlower4.append(subImage(textures, 289, 82, 15, 13))
+    # grassFlower3 = []
+    # grassFlower3.append(subImage(textures, 0, 21, 7, 4))
+    # grassFlower3.append(subImage(textures, 8, 21, 7, 6))
+    # grassFlower3.append(subImage(textures, 16, 21, 9, 8))
+    # grassFlower4 = []
+    # grassFlower4.append(subImage(textures, 258, 83, 12, 12))
+    # grassFlower4.append(subImage(textures, 274, 82, 14, 13))
+    # grassFlower4.append(subImage(textures, 289, 82, 15, 13))
     grassFlowerTiles.append(grassFlower1)
     grassFlowerTiles.append(grassFlower2)
-    grassFlowerTiles.append(grassFlower3)
-    grassFlowerTiles.append(grassFlower4)
+    # grassFlowerTiles.append(grassFlower3)
+    # grassFlowerTiles.append(grassFlower4)
     tilesBank['grassFlower'] = grassFlowerTiles
 
     grassBlocks = []

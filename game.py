@@ -21,7 +21,7 @@ class Game:
         self.spriteBank = sprites.loadSpriteBank(self.textures)
         self.mark = Mark(0, 0)
         self.map = Board(self.window, self.textures, self.spriteBank, self.mark)
-        self.map.initBoard(10, 10);
+        self.map.initBoard(10, 10, 10);
         self.allSprites = sprites.GameSpriteGroup()
         self.player = Player(self.window.get(), self.textures, 100, 100, self.allSprites, self.spriteBank, self.mark)
 
@@ -46,6 +46,7 @@ class Game:
         self.map.render()
         self.allSprites.draw(self.screen)
         self.window.render()
+
 
 def main():
     game = Game()
