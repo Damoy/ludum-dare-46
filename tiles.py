@@ -38,7 +38,8 @@ class FlowerGrassTile(Tile):
 
 class TreeTiles(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y,mark:mark.Mark):
-        Tile.__init__(self, loadedRessources['fullTree'], group, x, y,mark)
+
+        Tile.__init__(self, loadedRessources['tiles']['fullTree'], group, x, y,mark)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()

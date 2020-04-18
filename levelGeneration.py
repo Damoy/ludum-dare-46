@@ -54,7 +54,7 @@ class GameRoom:
     def generateLevel(self, spriteBank: dict, mark: mark.Mark):
         self.generateTiles(spriteBank['tiles'], mark)
         self.generateMobs(spriteBank, mark)
-        if self.nbWallToGenerate >0 :
+        if self.nbWallToGenerate > 0 :
             self.generateWalls(spriteBank['tiles'], mark)
 
     def render(self, window):
@@ -136,7 +136,7 @@ class TreeRoom(GameRoom):
     def generateLevel(self, spriteBank: dict, mark : mark.Mark):
         self.generateTiles(spriteBank['tiles'], mark)
         self.generateMobs(spriteBank, mark)
-        #self.generateWalls(spriteBank, mark)
+        self.generateWalls(spriteBank, mark)
 
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
