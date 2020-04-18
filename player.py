@@ -119,7 +119,7 @@ class Player(sprites.GameSprite):
                 self.y += dy
                 if dirUpdated:
                     self.setAnimationDirection()
-                elif self.pxMoveCount >= 16:
+                elif self.pxMoveCount >= config.TILESIZE:
                     self.pxMoveCount = 0
                     self.updateAnimation()
 

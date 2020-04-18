@@ -99,7 +99,7 @@ class BasicRoom(GameRoom):
 
     def buildMobs(self):
         self.enemiesToGenerate[mob.Gobelin] = 1
-
+        self.enemiesToGenerate[mob.Knight1] = 1
 
 
     def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
@@ -153,7 +153,6 @@ class TreeRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
         for x in range(self.nbWallToGenerate):
