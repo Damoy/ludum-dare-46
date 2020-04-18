@@ -20,24 +20,25 @@ class Board:
         self.maxHeight = self.rows * TILE_SIZE
         self.maxWidth = self.cols * TILE_SIZE
         self.tilesBank = spriteBank['tiles']
+
         self.tilesGroup = sprites.GameSpriteGroup()
         self.boardGrid = []
 
 
-    def initBoard(self, width, height):
+    def initBoard(self, width, height, size):
         self.boardGrid = [[None for x in range(width)] for y in range(height)]
         v = 0
         for y in range(width):
             v += 1
             for x in range(height):
-                room = self.generateRoom(y, x, width, height)
+                room = self.generateRoom(y, x, size)
                 self.boardGrid[x][y] = room
 
-    def generateRoom(self, line, column, width, height):
+    def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [BasicRoom]
-        newRoom = rooms[randint(0, len(rooms) - 1)](10, line, column, width, height)
+        rooms = [BasicRoom, TreeRoom,TreeRoom]
+        newRoom = rooms[randint(0, len(rooms) - 1)](size, line, column)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                        ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies )
@@ -95,7 +96,8 @@ class Board:
     def render(self):
         for line in self.boardGrid:
             for col in line:
-                if col.xStart - self.mark.x < config.WIDTH or col.xStart - self.mark.x < - 100:
+                if col.xStart - self.mark.x < config.CANVASWIDTH + config.CANVASWIDTH/ 1.5 and col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and\
+                        col.yStart - self.mark.y < config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 and col.yStart - self.mark.y > - config.CANVASHEIGHT/ 1.5:
                     col.render(self.window.get())
                     col.update()
 
