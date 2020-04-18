@@ -59,19 +59,6 @@ class DirectedAnimation:
         return self
 
 
-def loadPlayerAnimation(spriteBank: dict):
-    playerBank = spriteBank['entities']['characters']['player']
-    playerAnimation = DirectedAnimation(60, True)
-    for playerUpFrame in playerBank['up']:
-        playerAnimation.addFrame(Direction.UP, playerUpFrame)
-    for playerDownFrame in playerBank['down']:
-        playerAnimation.addFrame(Direction.DOWN, playerDownFrame)
-    for playerLeftFrame in playerBank['left']:
-        playerAnimation.addFrame(Direction.LEFT, playerLeftFrame)
-    for playerRightFrame in playerBank['right']:
-        playerAnimation.addFrame(Direction.RIGHT, playerRightFrame)
-    return playerAnimation
-
 def subImage(image: pygame.image, x, y, w, h):
     return image.subsurface(Rect(x, y, w, h)).convert()
 
@@ -144,10 +131,29 @@ def loadSpriteBank(textures: pygame.image):
     playerLeftFrames.append(pygame.transform.flip(playerRightFrames[0], True, False).convert())
     playerLeftFrames.append(pygame.transform.flip(playerRightFrames[1], True, False).convert())
 
-    playerBank['down'] = playerDownFrames
-    playerBank['up'] = playerUpFrames
-    playerBank['left'] = playerLeftFrames
-    playerBank['right'] = playerRightFrames
+    playerDash = {}
+    playerDash['down'] = []
+    playerDash['down'].append(subImage(textures, 0, 34, 14, 14))
+    playerDash['down'].append(subImage(textures, 16, 33, 16, 15))
+    playerDash['up'] = []
+    playerDash['up'].append(subImage(textures, 34, 34, 14, 14))
+    playerDash['up'].append(subImage(textures, 49, 34, 14, 15))
+    playerDash['right'] = []
+    playerDash['right'].append(subImage(textures, 65, 34, 14, 14))
+    playerDash['right'].append(subImage(textures, 81, 34, 15, 14))
+    playerDash['left'] = []
+    playerDash['left'].append(pygame.transform.flip(playerDash['right'][0], True, False).convert())
+    playerDash['left'].append(pygame.transform.flip(playerDash['right'][1], True, False).convert())
+
+    playerWalk = {}
+    playerWalk['down'] = playerDownFrames
+    playerWalk['up'] = playerUpFrames
+    playerWalk['left'] = playerLeftFrames
+    playerWalk['right'] = playerRightFrames
+
+    playerBank['walk'] = playerWalk
+    playerBank['dash'] = playerDash
+
     characters['player'] = playerBank
     entitiesBank['characters'] = characters
 

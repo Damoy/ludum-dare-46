@@ -4,14 +4,15 @@ import pygame
 from player import Player
 from window import Window
 from map import Map
-import sprites
 
+import config
+import sprites
 
 class Game:
     def __init__(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1' # to center window
         pygame.init()
-        self.window = Window("Game", 900, 680, 3, flags=0) # [300, 226]
+        self.window = Window("Game", 912, 672, 3, flags=0) # [304, 224]
         self.screen = self.window.get()
         self.clock = pygame.time.Clock()
         self.isRunning = False
@@ -24,7 +25,7 @@ class Game:
     def gameLoop(self):
         self.isRunning = True
         while self.isRunning:
-            self.clock.tick(120)
+            self.clock.tick(config.FPS)
             self.update()
             if not self.isRunning:
                 break
