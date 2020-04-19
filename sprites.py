@@ -62,6 +62,7 @@ class DirectedAnimation:
 def subImage(image: pygame.image, x, y, w, h):
     return image.subsurface(Rect(x, y, w, h)).convert()
 
+SPRITE_BANK = None
 
 def loadSpriteBank(textures: pygame.image):
     spriteBank = {}
@@ -126,6 +127,7 @@ def loadSpriteBank(textures: pygame.image):
     dungeonWalls['down'] = []
     dungeonWalls['down'].append(subImage(textures, 146, 275, 16, 16))
     dungeonWalls['down'].append(subImage(textures, 178, 275, 16, 16))
+    dungeonWalls['down'].append(subImage(textures, 272, 163, 16, 16))
     dungeonWalls['right'] = []
     for dungeonWallLeftFrame in dungeonWalls['left']:
         dungeonWalls['right'].append(pygame.transform.flip(dungeonWallLeftFrame, True, False).convert())
@@ -229,5 +231,8 @@ def loadSpriteBank(textures: pygame.image):
 
     spriteBank['tiles'] = tilesBank
     spriteBank['entities'] = entitiesBank
+
+    global SPRITE_BANK
+    SPRITE_BANK = spriteBank
     return spriteBank
 

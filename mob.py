@@ -192,3 +192,27 @@ class Skeleton(Mob):
             anim.addFrame(Direction.RIGHT, rightFrame)
         anim.setDirection(random.choice([Direction.LEFT, Direction.RIGHT]))
         return anim
+
+class DecorationSkeleton(Mob):
+    def __init__(self, x, y, group: sprites.GameSpriteGroup,
+                 spriteBank: dict, mark: Mark, textures: pygame.image):
+        Mob.__init__(self, x, y, group, spriteBank, mark, textures,
+                     spriteBank['dungeon']['mobs']['skeleton']['right'][0],
+                     2, 1)
+
+    def update(self, roomBounds):
+        self.fixBounds(roomBounds)
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+# class DecorationLeftSkeleton(Skeleton):
+#     def __init__(self, x, y, group: sprites.GameSpriteGroup,
+#                  spriteBank: dict, mark: Mark, textures: pygame.image):
+#         Skeleton.__init__(self, x, y, group, spriteBank, mark, textures,
+#                      spriteBank['dungeon']['mobs']['skeleton']['left'][0],
+#                      2, 1)
+#
+#     def update(self, roomBounds):
+#         self.fixBounds(roomBounds)
+#         self.rect.x = self.x - self.mark.getX()
+#         self.rect.y = self.y - self.mark.getY()

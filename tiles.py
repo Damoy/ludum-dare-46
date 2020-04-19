@@ -94,6 +94,15 @@ class WallTilesLeft(Tile):
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 
+class WallTilesRight(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark, id):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['right'][id], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
 class WallTilesTopLeftCorner(Tile):
     def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
 
@@ -127,6 +136,24 @@ class WallTilesUpRightCorner(Tile):
     def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
 
         Tile.__init__(self, spriteBank['dungeon']['walls']['upRightCorner'], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+class WallTilesDown(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark, id):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['down'][id], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+class KnightTaupiqueurTile(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark, id):
+
+        Tile.__init__(self, spriteBank['entities']['characters']['enemies']['knight1']['right'][id], group, x, y, mark)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()

@@ -54,20 +54,20 @@ class Board:
             self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w, self.texts, self.player)
             self.boardGrid[len(self.boardGrid[0]) - 1][w].generateLevel(self.spriteBank, self.mark)
 
-        w2 = width // 2
-        h2 = height // 2
-        w2 = 0
-        h2 = 0
-        print("w2:", w2, ";h2:", h2)
-        self.boardGrid[h2][w2] = CastleCenterRoom(self.textures, size, w2, h2, self.texts, self.player)
-        self.boardGrid[h2][w2].generateLevel(self.spriteBank, self.mark)
-        print(self.boardGrid[h2][w2])
-
         for y in range(1, width - 1):
             for x in range(1, height - 1):
                 room = self.generateRoom(y, x, size)
                 self.boardGrid[y][x] = room
         print(self.boardGrid[9][0])
+
+        w2 = width // 2
+        h2 = height // 2
+        # w2 = 0
+        # h2 = 0
+        print("w2:", w2, ";h2:", h2)
+        self.boardGrid[h2][w2] = CastleCenterRoom(self.textures, size, w2, h2, self.texts, self.player)
+        self.boardGrid[h2][w2].generateLevel(self.spriteBank, self.mark)
+        print(self.boardGrid[h2][w2])
 
     def generateRoom(self, line, column, size):
         #TODO stuff
