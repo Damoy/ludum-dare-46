@@ -23,6 +23,7 @@ class GameRoom:
         self.player = player
         self.textures = textures
         self.fixedTiles = []
+        self.texts = texts
         # Wall
         self.physics = [[0 for x in range(size)] for y in range(size)]
         self.fixedWalls = []
@@ -64,7 +65,7 @@ class GameRoom:
         self.generateMobs(spriteBank, mark)
         self.generateWalls(spriteBank, mark)
         if self.nbWallToGenerate > 0:
-            self.generateWalls(spriteBank['tiles'], mark)
+            self.generateWalls(spriteBank, mark)
         self.generateItems(spriteBank, mark)
 
     def render(self, window):
@@ -271,8 +272,8 @@ class TreeRoom(GameRoom):
 
 
 class RuinedWildRoom(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column, player):
-        GameRoom.__init__(self, textures, size, line, column, player)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.tilesToGenerate.append(tiles.FloorTiles)
@@ -654,8 +655,8 @@ class VCorridorWallRoom(GameRoom):
 
 
 class LeftBorder(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [Adjacency.TOP, Adjacency.RIGHT, Adjacency.BOTTOM]
@@ -717,8 +718,8 @@ class LeftBorder(GameRoom):
 
 
 class TopBorder(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [ Adjacency.RIGHT, Adjacency.BOTTOM,Adjacency.LEFT]
@@ -780,8 +781,8 @@ class TopBorder(GameRoom):
 
 
 class BotBorder(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [ Adjacency.RIGHT, Adjacency.TOP,Adjacency.LEFT]
@@ -840,8 +841,8 @@ class BotBorder(GameRoom):
 
 
 class RightBorder(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [ Adjacency.LEFT, Adjacency.TOP,Adjacency.LEFT]
@@ -891,8 +892,8 @@ class RightBorder(GameRoom):
 
 class TopLeftBorder(GameRoom):
 
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [Adjacency.RIGHT, Adjacency.BOTTOM]
@@ -949,8 +950,8 @@ class TopLeftBorder(GameRoom):
 
 class TopRightBorder(GameRoom):
 
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [Adjacency.LEFT, Adjacency.BOTTOM]
@@ -1018,8 +1019,8 @@ class TopRightBorder(GameRoom):
 
 class TopRightBorder(GameRoom):
 
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [Adjacency.LEFT, Adjacency.BOTTOM]
@@ -1077,8 +1078,8 @@ class TopRightBorder(GameRoom):
 
 class BottomRightBorder(GameRoom):
 
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [Adjacency.LEFT, Adjacency.TOP]
@@ -1135,8 +1136,8 @@ class BottomRightBorder(GameRoom):
 
 class BottomLeftBorder(GameRoom):
 
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.adjacencies = [Adjacency.RIGHT, Adjacency.TOP]

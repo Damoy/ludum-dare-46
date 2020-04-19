@@ -11,7 +11,8 @@ TILE_SIZE = 16
 
 
 class Board:
-    def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark):
+    def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark,
+                 texts: text.Texts, player):
         self.mark = mark
         self.window = window
         self.textures = textures
@@ -29,28 +30,28 @@ class Board:
     def initBoard(self, width, height,size):
         self.boardGrid = [[None for x in range(width)] for y in range(height)]
 
-        self.boardGrid[0][0] = TopLeftBorder(self.textures, size, 0, 0)
+        self.boardGrid[0][0] = TopLeftBorder(self.textures, size, 0, 0, self.texts, self.player)
         self.boardGrid[0][0].generateLevel(self.spriteBank, self.mark)
 
-        self.boardGrid[0][len(self.boardGrid) - 1] = TopRightBorder(self.textures, size, 0, len(self.boardGrid[0]))
+        self.boardGrid[0][len(self.boardGrid) - 1] = TopRightBorder(self.textures, size, 0, len(self.boardGrid[0]), self.texts, self.player)
         self.boardGrid[0][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
         print(self.boardGrid[0][len(self.boardGrid) - 1])
-        self.boardGrid[len(self.boardGrid[0]) - 1][0] = BottomLeftBorder(self.textures, size, len(self.boardGrid), 0)
+        self.boardGrid[len(self.boardGrid[0]) - 1][0] = BottomLeftBorder(self.textures, size, len(self.boardGrid), 0, self.texts, self.player)
         self.boardGrid[len(self.boardGrid[0]) - 1][0].generateLevel(self.spriteBank, self.mark)
 
-        self.boardGrid[len(self.boardGrid[0])- 1][len(self.boardGrid) - 1] = BottomRightBorder(self.textures, size, len(self.boardGrid), len(self.boardGrid))
+        self.boardGrid[len(self.boardGrid[0])- 1][len(self.boardGrid) - 1] = BottomRightBorder(self.textures, size, len(self.boardGrid), len(self.boardGrid), self.texts, self.player)
         self.boardGrid[len(self.boardGrid[0])- 1][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
 
         for z in range(1, height):
-            self.boardGrid[z][0] = LeftBorder(self.textures, size, z, 0)
+            self.boardGrid[z][0] = LeftBorder(self.textures, size, z, 0, self.texts, self.player)
             self.boardGrid[z][0].generateLevel(self.spriteBank, self.mark)
-            self.boardGrid[z][len(self.boardGrid) - 1] = RightBorder(self.textures, size, z, 0)
+            self.boardGrid[z][len(self.boardGrid) - 1] = RightBorder(self.textures, size, z, 0, self.texts, self.player)
             self.boardGrid[z][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
 
         for w in range(1, width - 1):
-            self.boardGrid[0][w] = TopBorder(self.textures, size, 0, w)
+            self.boardGrid[0][w] = TopBorder(self.textures, size, 0, w, self.texts, self.player)
             self.boardGrid[0][w].generateLevel(self.spriteBank, self.mark)
-            self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w)
+            self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w, self.texts, self.player)
             self.boardGrid[len(self.boardGrid[0]) - 1][w].generateLevel(self.spriteBank, self.mark)
 
         for y in range(1, width - 1):
@@ -65,7 +66,7 @@ class Board:
         #like LevelMAnager.getArray
 
         rooms = [BasicRoom, VCorridorWallRoom,RuinedWildRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
+        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts, self.player)
 
         possibleTop = Adjacency.ALL in newRoom.adjacencies or (((Adjacency.TOP in newRoom.adjacencies and
                                                                 not (line == 0)) and (
@@ -139,7 +140,7 @@ class Board:
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
-            newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
+            newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts, self.player)
 
             possibleTop = Adjacency.ALL in newRoom.adjacencies or (((Adjacency.TOP in newRoom.adjacencies and
                                                                      not (line == 0)) and (
