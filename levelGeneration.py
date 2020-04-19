@@ -12,6 +12,7 @@ class Adjacency(Enum):
     BOTTOM = 1
     LEFT = 2
     RIGHT = 3
+    ALL = 4
 
 
 class GameRoom:
