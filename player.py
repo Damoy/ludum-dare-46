@@ -246,4 +246,9 @@ class Player(sprites.GameSprite):
             self.setAnimationDirection()
             self.pxMoveCount = 0
 
+    def collideMob(self, mob):
+        self.life -= mob.damage
+        print("colision")
 
+        self.x -= self.dx
+        self.y -= self.dy

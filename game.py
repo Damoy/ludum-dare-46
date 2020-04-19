@@ -38,6 +38,7 @@ class Game:
         pygame.quit()
 
     def update(self):
+
         self.board.update()
         if not self.checkCollide(self.player):
             self.player.handleInput()
@@ -45,13 +46,15 @@ class Game:
             self.player.y += -self.player.dy
             self.player.x += -self.player.dx
 
+        self.allSprites.update()
+        self.updateMark()
 
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
 
-        self.allSprites.update()
 
-        self.updateMark()
+
+
         if self.player.userEnded:
             self.isRunning = False
 
@@ -60,17 +63,18 @@ class Game:
             for col in line:
                 if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
                         config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+
+                    for mob in col.enemiesGenerated:
+                        if pygame.sprite.collide_rect(mob, player):
+                            player.collideMob(mob)
                     for wall in col.generatedWall:
-                        print(pygame.sprite.groupcollide(self.allSprites, col.enemies, False,False))
-                        for mob in pygame.sprite.groupcollide(self, col.enemies, False,False):
-                            mob.x += -mob.dx
-                            mob.y += -mob.dy
+
+                        for mob in col.enemiesGenerated:
+                            if pygame.sprite.collide_rect(mob, wall):
+                                mob.collideWall()
+
                         if pygame.sprite.collide_rect(player, wall):
                             return True
-
-
-
-
         return False
 
 
