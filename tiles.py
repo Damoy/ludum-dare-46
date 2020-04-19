@@ -20,7 +20,7 @@ class Tile(sprites.GameSprite):
 
 class GrassTile(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
-        Tile.__init__(self, loadedRessources['grass'], group, x, y,mark)
+        Tile.__init__(self, loadedRessources['tiles']['grass'], group, x, y,mark)
         # print("x:", x, ";y:", y)
 
     def update(self):
@@ -30,17 +30,27 @@ class GrassTile(Tile):
 
 class FlowerGrassTile(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
-        flowerSet = randint(0, len(loadedRessources['grassFlower'])-1)
-        Tile.__init__(self, loadedRessources['grassFlower'][flowerSet][randint(0, len(loadedRessources['grassFlower'][flowerSet]) - 1)], group, x, y, mark)
+        flowerSet = randint(0, len(loadedRessources['tiles']['grassFlower'])-1)
+        Tile.__init__(self, loadedRessources['tiles']['grassFlower'][flowerSet][randint(0, len(loadedRessources['tiles']['grassFlower'][flowerSet]) - 1)], group, x, y, mark)
         # print("x:", x, ";y:", y)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 
+
 class TreeTiles(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y,mark:mark.Mark):
-        Tile.__init__(self, loadedRessources['fullTree'], group, x, y,mark)
+        Tile.__init__(self, loadedRessources['tiles']['fullTree'], group, x, y,mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+
+class BorderTiles(Tile):
+    def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+        Tile.__init__(self, loadedRessources['tiles']['grassPlant'][0], group, x, y, mark)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()
@@ -49,7 +59,7 @@ class TreeTiles(Tile):
 
 class FloorTiles(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
-        Tile.__init__(self, loadedRessources['grassPlant'][0], group, x, y, mark)
+        Tile.__init__(self, loadedRessources['dungeon']['tiles']['floor'][randint(0, len(loadedRessources['dungeon']['tiles']['floor']) - 1)], group, x, y, mark)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()
@@ -58,7 +68,8 @@ class FloorTiles(Tile):
 
 class WallTiles(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
-        Tile.__init__(self, loadedRessources['grassPlant'][1], group, x, y, mark)
+
+        Tile.__init__(self, loadedRessources['dungeon']['walls']['up'][randint(0, len(loadedRessources['dungeon']['walls']['up']) - 1)], group, x, y, mark)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()

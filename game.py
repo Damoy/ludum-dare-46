@@ -27,8 +27,11 @@ class Game:
         self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites, self.spriteBank, self.mark, self.sounds)
 
     def gameLoop(self):
+
+
         self.isRunning = True
         while self.isRunning:
+
             self.clock.tick(config.FPS)
             self.update()
             if not self.isRunning:
@@ -42,8 +45,8 @@ class Game:
         if not self.checkCollide(self.player):
             self.player.handleInput()
         else:
-            self.player.y += -self.player.dy
-            self.player.x += -self.player.dx
+            self.player.y += - self.player.dy
+            self.player.x += - self.player.dx
 
         if self.player.x < 0:
             self.player.x = 0
@@ -73,17 +76,16 @@ class Game:
         mobs = {}
         for line in self.board.boardGrid:
             for col in line:
-                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT  / 1.5:
+                if config.CANVASWIDTH + config.CANVASWIDTH / 2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH / 2 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT / 2:
                     mobs[col] = {"mobsGen": col.enemiesGenerated} # "mobsDestroy": col.enemiesToDestroy
         return mobs
 
     def cleanMobs(self):
         for line in self.board.boardGrid:
             for col in line:
-                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
-
+                if config.CANVASWIDTH + config.CANVASWIDTH / 2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH / 2 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT / 2:
                     for mob in col.enemiesToDestroy:
                         if mob in col.enemiesGenerated:
                             self.sounds.playHitSound()
@@ -92,11 +94,11 @@ class Game:
                     col.enemiesToDestroy.clear()
 
     def checkCollide(self, player):
+
         for line in self.board.boardGrid:
             for col in line:
-                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
-
+                if config.CANVASWIDTH + config.CANVASWIDTH / 2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH / 2 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT / 2:
                     for mob in col.enemiesGenerated:
                         if pygame.sprite.collide_rect(mob, player):
                             player.collideMob(mob, col.generatedWall)
@@ -123,10 +125,11 @@ class Game:
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.30
             self.player.mark.y += offset
 
-        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > 17 * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT - 64 :
+        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > 17 * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT + 16 :
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.70
             self.mark.y += offset
-
+        self.mark.y = int(self.mark.y)
+        self.mark.x = int(self.mark.x)
     def render(self):
 
         self.screen.fill((255, 255, 255))

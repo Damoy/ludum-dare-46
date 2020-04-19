@@ -115,8 +115,10 @@ class Player(sprites.GameSprite):
         # self.handleInput()
         self.handleAttack(mobsDico)
 
-        self.rect.x = int(self.x - self.mark.getX())
-        self.rect.y = int(self.y - self.mark.getY())
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+        self.rect.x = self.rect.x
+
 
     def handleAttack(self, mobsDico):
         # attack arc circle
@@ -178,7 +180,6 @@ class Player(sprites.GameSprite):
         if keys[pygame.K_ESCAPE]:
             self.userEnded = True
             return
-
         self.move()
         self.attack()
 
