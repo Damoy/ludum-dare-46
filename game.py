@@ -37,6 +37,7 @@ class Game:
             self.render()
         pygame.quit()
 
+
     def update(self):
 
         self.board.update()
@@ -46,7 +47,12 @@ class Game:
             self.player.y += -self.player.dy
             self.player.x += -self.player.dx
 
+
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+
         self.allSprites.update()
+
         self.updateMark()
 
         keys = pygame.key.get_pressed()
@@ -68,11 +74,6 @@ class Game:
                         if pygame.sprite.collide_rect(mob, player):
                             player.collideMob(mob)
                     for wall in col.generatedWall:
-
-                        for mob in col.enemiesGenerated:
-                            if pygame.sprite.collide_rect(mob, wall):
-                                mob.collideWall()
-
                         if pygame.sprite.collide_rect(player, wall):
                             return True
         return False
