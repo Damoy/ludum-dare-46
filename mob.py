@@ -12,8 +12,8 @@ class Mob(sprites.GameSprite):
                  life, damage):
         sprites.GameSprite.__init__(self, startImage, group)
         self.mark = mark
-        self.dx = 0;
-        self.dy = 0;
+        self.dx = 0
+        self.dy = 0
         self.rect.x = x
         self.rect.y = y
         self.x = x

@@ -160,7 +160,6 @@ def loadSpriteBank(textures: pygame.image):
     dungeonBank['mobs'] = dungeonMobs
     spriteBank['dungeon'] = dungeonBank
 
-
     entitiesBank = {}
     entitiesBank['potion'] = subImage(textures, 0, 51, 9, 13)
     entitiesBank['seed'] = subImage(textures, 10, 13, 7, 11)

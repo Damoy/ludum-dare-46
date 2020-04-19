@@ -6,6 +6,9 @@ from enum import Enum
 from random import randint
 import sprites
 import mob
+import item
+import random
+import text
 
 class Adjacency(Enum):
     TOP = 0
@@ -15,8 +18,7 @@ class Adjacency(Enum):
 
 
 class GameRoom:
-    def __init__(self, textures: pygame.image, size, line, column):
-
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
         self.textures = textures
         self.fixedTiles = []
         # Wall
@@ -26,6 +28,8 @@ class GameRoom:
 
         self.tiles = []
         self.size = size
+
+        self.texts = texts
 
         self.size = size
         self.line = line
@@ -43,7 +47,11 @@ class GameRoom:
         self.enemies = sprites.GameSpriteGroup()
         self.enemiesGenerated = []
         self.enemiesToDestroy = []
-        self.items = []
+
+        self.items = sprites.GameSpriteGroup()
+        self.itemsToGenerate = {}
+        self.itemsGenerated = []
+        self.itemsToDestroy = []
 
         self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM, Adjacency.LEFT, Adjacency.RIGHT]
 
@@ -54,16 +62,22 @@ class GameRoom:
     def generateLevel(self, spriteBank: dict, mark: mark.Mark):
         self.generateTiles(spriteBank['tiles'], mark)
         self.generateMobs(spriteBank, mark)
-        if self.nbWallToGenerate > 0 :
+        if self.nbWallToGenerate > 0:
             self.generateWalls(spriteBank['tiles'], mark)
+        self.generateItems(spriteBank, mark)
 
     def render(self, window):
         if self.tilesGroup:
             self.tilesGroup.draw(window)
         if self.enemies:
             self.enemies.draw(window)
-            for enemy in self.enemiesGenerated:
-                enemy.render(window)
+            # for enemy in self.enemiesGenerated:
+            #     enemy.render(window)
+        if self.itemsGenerated:
+            # self.items.draw(window)
+            for item in self.itemsGenerated:
+                item.render(window)
+
 
     def update(self):
         if self.tilesGroup:
@@ -71,6 +85,8 @@ class GameRoom:
         if self.enemies:
             self.enemies.update([self.xStart, self.xStart + self.width - config.TILESIZE,
                                  self.yStart, self.yStart + self.height - config.TILESIZE])
+        if self.items:
+            self.items.update()
 
     def getRandomX(self):
         return randint(self.xStart, self.xStart + self.width - config.TILESIZE)
@@ -79,6 +95,9 @@ class GameRoom:
         return randint(self.yStart, self.yStart + self.height - config.TILESIZE)
 
     def buildMobs(self):
+        pass
+
+    def buildItems(self):
         pass
 
     def generateTiles(self, loadedRessource: dict, mark : mark.Mark):
@@ -90,20 +109,24 @@ class GameRoom:
     def generateWalls(self, loadedRessource: dict, mark : mark.Mark):
         pass
 
-class BasicRoom(GameRoom):
-    #Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column):
+    def generateItems(self, loadedRessource: dict, mark: mark.Mark):
+        pass
 
-        GameRoom.__init__(self, textures, size, line, column)
+class BasicRoom(GameRoom):
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
+        GameRoom.__init__(self, textures, size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.buildMobs()
+        self.buildItems()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 1
-        self.enemiesToGenerate[mob.Knight1] = 1
-        self.enemiesToGenerate[mob.Skeleton] = 1
+        self.enemiesToGenerate[mob.Gobelin] = {"nb": 1, "proba": 0.25}
+        self.enemiesToGenerate[mob.Knight1] = {"nb": 1, "proba": 0.25}
+        self.enemiesToGenerate[mob.Skeleton] = {"nb": 1, "proba": 0.25}
 
+    def buildItems(self):
+        self.itemsToGenerate[item.Scroll] = {"nb": 1, "proba": 0.20, "content": "ZIZOU"}
 
     def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -115,18 +138,39 @@ class BasicRoom(GameRoom):
 
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
-            for nb in range(self.enemiesToGenerate[mobClass]):
-                x = self.getRandomX()
-                y = self.getRandomY()
-                m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
-                self.enemies.add(m)
-                self.enemiesGenerated.append(m)
+            mobGenInfo = self.enemiesToGenerate[mobClass]
+            nbToGen = mobGenInfo['nb']
+            proba = 1 // mobGenInfo['proba']
+            for nb in range(nbToGen):
+                if random.randint(0, proba - 1) == 0:
+                    x = self.getRandomX()
+                    y = self.getRandomY()
+                    m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
+                    self.enemies.add(m)
+                    self.enemiesGenerated.append(m)
+
+    def generateItems(self, spriteBank: dict, mark: mark.Mark):
+        for itemClass in self.itemsToGenerate:
+            itemGenInfo = self.itemsToGenerate[itemClass]
+            nbToGen = itemGenInfo['nb']
+            proba = 1 // itemGenInfo['proba']
+            for nb in range(nbToGen):
+                if random.randint(0, proba - 1) == 0:
+                    # print("JYHTGFRDES")
+                    x = self.getRandomX()
+                    y = self.getRandomY()
+                    if 'content' in itemGenInfo:
+                        m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts, itemGenInfo['content'])
+                    else:
+                        m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts)
+                    self.items.add(m)
+                    self.itemsGenerated.append(m)
 
 
 class TreeRoom(GameRoom):
     #Todo rename cette
-    def __init__(self, textures: pygame.image,size, line, column):
-        GameRoom.__init__(self, textures,size, line, column)
+    def __init__(self, textures: pygame.image,size, line, column, texts: text.Texts):
+        GameRoom.__init__(self, textures,size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 2, tiles.TreeTiles))
@@ -255,8 +299,8 @@ class RuinedWildRoom(GameRoom):
 
 class CossWallRoom(GameRoom):
     # Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
+        GameRoom.__init__(self, textures, size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
@@ -352,8 +396,8 @@ class CossWallRoom(GameRoom):
 
 class HCorridorWallRoom(GameRoom):
     # Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
+        GameRoom.__init__(self, textures, size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
@@ -456,8 +500,8 @@ class HCorridorWallRoom(GameRoom):
 
 class VCorridorWallRoom(GameRoom):
     # Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
+        GameRoom.__init__(self, textures, size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))

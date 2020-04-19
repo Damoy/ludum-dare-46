@@ -8,6 +8,7 @@ from mark import Mark
 import sprites
 import config
 import sound
+import text
 
 class Game:
     def __init__(self):
@@ -17,14 +18,16 @@ class Game:
         self.screen = self.window.get()
         self.clock = pygame.time.Clock()
         self.isRunning = False
+        self.texts = text.Texts(self.screen)
         self.textures = sprites.load(os.path.join('res', 'graphics', 'textures.png'))
         self.spriteBank = sprites.loadSpriteBank(self.textures)
         self.mark = Mark(0, 0)
-        self.board = Board(self.window, self.textures, self.spriteBank, self.mark)
+        self.board = Board(self.window, self.textures, self.spriteBank, self.mark, self.texts)
         self.board.initBoard(10, 10, 10);
         self.allSprites = sprites.GameSpriteGroup()
         self.sounds = sound.Sounds()
-        self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites, self.spriteBank, self.mark, self.sounds)
+        self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites,
+                             self.spriteBank, self.mark, self.sounds)
 
     def gameLoop(self):
         self.isRunning = True
@@ -51,7 +54,6 @@ class Game:
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
         mobsDico = self.getScreenMobs()
-        # print("mobs: ", mobsDico)
 
         self.player.update(mobsDico)
         self.updateMark()

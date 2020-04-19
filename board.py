@@ -6,12 +6,14 @@ import sprites
 import mark
 import random
 from tiles import Tile
+import text
 
 TILE_SIZE = 16
 
 
 class Board:
-    def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark):
+    def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark,
+                 texts: text.Texts):
         self.mark = mark
         self.window = window
         self.textures = textures
@@ -22,6 +24,7 @@ class Board:
         self.spriteBank = spriteBank
         self.tilesGroup = sprites.GameSpriteGroup()
         self.boardGrid = []
+        self.texts = texts
 
 
     def initBoard(self, width, height,size):
@@ -37,7 +40,7 @@ class Board:
         #TODO stuff
         #like LevelMAnager.getArray
         rooms = [HCorridorWallRoom, BasicRoom,BasicRoom,BasicRoom,BasicRoom,BasicRoom,CossWallRoom, VCorridorWallRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
+        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                        ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies )
@@ -58,7 +61,7 @@ class Board:
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
-            newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
+            newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts)
 
             possibleTop = (Adjacency.TOP in newRoom.adjacencies and
                            ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in
