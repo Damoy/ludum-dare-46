@@ -45,12 +45,13 @@ class Board:
             self.boardGrid[z][len(self.boardGrid) - 1] = RightBorder(self.textures, size, z, 0)
             self.boardGrid[z][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
 
-        # for w in range(1, width - 1):
-        #     self.boardGrid[0][w] = TopBorder(self.textures, size, 0, w)
-        #     self.boardGrid[0][w].generateLevel(self.spriteBank, self.mark)
-        #     self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w)
-        #     self.boardGrid[len(self.boardGrid[0]) - 1][w].generateLevel(self.spriteBank, self.mark)
-        for y in range(0, width):
+        for w in range(1, width - 1):
+            self.boardGrid[0][w] = TopBorder(self.textures, size, 0, w)
+            self.boardGrid[0][w].generateLevel(self.spriteBank, self.mark)
+            self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w)
+            self.boardGrid[len(self.boardGrid[0]) - 1][w].generateLevel(self.spriteBank, self.mark)
+
+        for y in range(1, width - 1):
 
             for x in range(1, height - 1 ):
                 room = self.generateRoom(y, x, size)
