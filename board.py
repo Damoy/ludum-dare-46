@@ -36,7 +36,7 @@ class Board:
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [HCorridorWallRoom, BasicRoom,BasicRoom,BasicRoom,BasicRoom,BasicRoom,CossWallRoom, VCorridorWallRoom];
+        rooms = [HCorridorWallRoom, BasicRoom,CossWallRoom, VCorridorWallRoom];
         newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
@@ -87,16 +87,19 @@ class Board:
     def update(self):
         for line in self.boardGrid:
             for col in line:
-                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+                if config.CANVASWIDTH + config.CANVASWIDTH/2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH/2 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT/2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT/2:
+                    config.Rendered += 1
                     col.update()
 
+
     def render(self):
-        window = self.window.get()
+        surface = self.window.get()
         for line in self.boardGrid:
             for col in line:
-                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
-                    col.render(window)
+                if config.CANVASWIDTH + config.CANVASWIDTH /2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH / 2 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT/2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT/2:
+                    col.render(surface)
+                    pass
 
 

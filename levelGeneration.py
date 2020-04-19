@@ -118,7 +118,7 @@ class BasicRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-
+                self.enemiesGenerated.append(m)
 
 class TreeRoom(GameRoom):
     #Todo rename cette
@@ -193,7 +193,7 @@ class RuinedWildRoom(GameRoom):
         self.buildMobs()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 5
+        self.enemiesToGenerate[mob.Gobelin] = 1
 
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -259,7 +259,7 @@ class CossWallRoom(GameRoom):
         self.buildMobs()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 5
+        self.enemiesToGenerate[mob.Gobelin] = 1
 
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -358,7 +358,7 @@ class HCorridorWallRoom(GameRoom):
         self.buildMobs()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 5
+        self.enemiesToGenerate[mob.Gobelin] = 1
 
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -462,7 +462,7 @@ class VCorridorWallRoom(GameRoom):
         self.buildMobs()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 5
+        self.enemiesToGenerate[mob.Gobelin] = 1
 
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()

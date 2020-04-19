@@ -13,7 +13,7 @@ class Game:
     def __init__(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1' # to center window
         pygame.init()
-        self.window = Window("Game", config.HEIGHT, config.WIDTH, 3, flags=0) # [300, 226]
+        self.window = Window("Game", config.HEIGHT, config.WIDTH, 4, flags=0 ) # [300, 226]
         self.screen = self.window.get()
         self.clock = pygame.time.Clock()
         self.isRunning = False
@@ -21,7 +21,7 @@ class Game:
         self.spriteBank = sprites.loadSpriteBank(self.textures)
         self.mark = Mark(0, 0)
         self.board = Board(self.window, self.textures, self.spriteBank, self.mark)
-        self.board.initBoard(10, 10, 10);
+        self.board.initBoard(10, 10, 16);
         self.allSprites = sprites.GameSpriteGroup()
         self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites, self.spriteBank, self.mark)
 
@@ -39,8 +39,10 @@ class Game:
 
 
     def update(self):
+        config.Rendered = 0
 
         self.board.update()
+        # print(config.Rendered)
         if not self.checkCollide(self.player):
             self.player.handleInput()
         else:
@@ -52,15 +54,10 @@ class Game:
         events = pygame.event.get()
 
         self.allSprites.update()
-
         self.updateMark()
 
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
-
-
-
-
         if self.player.userEnded:
             self.isRunning = False
 
@@ -69,11 +66,13 @@ class Game:
             for col in line:
                 if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
                         config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
-
                     for mob in col.enemiesGenerated:
                         if pygame.sprite.collide_rect(mob, player):
-                            player.collideMob(mob)
+                            player.collideMob(mob, col.generatedWall)
                     for wall in col.generatedWall:
+                        for mob in col.enemiesGenerated:
+                            if pygame.sprite.collide_rect(mob, wall):
+                                mob.collideWall()
                         if pygame.sprite.collide_rect(player, wall):
                             return True
         return False
@@ -85,11 +84,11 @@ class Game:
             offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.70
             self.mark.x += offset
 
-        elif self.player.x - self.mark.getX() < self.player.screen.get_width() * 0.30 and not self.player.x < config.CANVASWIDTH :
+        elif self.player.x - self.mark.getX() < self.player.screen.get_width() * 0.30 and not self.player.x + self.mark.getX() < config.CANVASWIDTH * 0.30 :
             offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.30
             self.mark.x += offset
 
-        if self.player.y - self.mark.getY() < self.player.screen.get_height() * 0.30 and not self.player.y < config.CANVASHEIGHT:
+        if self.player.y - self.mark.getY() < self.player.screen.get_height() * 0.30 and not self.player.y < config.CANVASHEIGHT * 0.30:
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.30
             self.player.mark.y += offset
 
@@ -98,11 +97,13 @@ class Game:
             self.mark.y += offset
 
     def render(self):
+
         self.screen.fill((255, 255, 255))
         self.board.render()
         self.player.render()
         self.allSprites.draw(self.screen)
         self.window.render()
+
 
     def compute_penetration(self, block, old_rect, new_rect):
         """Calcul la distance de pénétration du `new_rect` dans le `block` donné.

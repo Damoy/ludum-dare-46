@@ -16,7 +16,7 @@ class Window:
 
     def create(self):
         self.content = pygame.display.set_mode((self.width, self.height), flags=self.flags)
-        self.scaledContent = pygame.Surface([self.widthScaled, self.heigthScaled])
+        self.scaledContent = pygame.Surface([self.widthScaled, self.heigthScaled]).convert()
         pygame.display.set_caption(self.title)
         return self.scaledContent
 
@@ -26,4 +26,4 @@ class Window:
     def render(self):
         frame = pygame.transform.scale(self.scaledContent, (self.width, self.height))
         self.content.blit(frame, frame.get_rect())
-        pygame.display.update()
+        pygame.display.flip()
