@@ -59,14 +59,20 @@ class GameRoom:
         self.xStart = config.TILESIZE * size * column
         self.yStart = config.TILESIZE * size * line
         self.tilesGroup = None
+        self.buildMobs()
+        self.buildItems()
 
-    def generateLevel(self, spriteBank: dict, mark: mark.Mark):
-        self.generateTiles(spriteBank, mark)
-        self.generateMobs(spriteBank, mark)
-        self.generateWalls(spriteBank, mark)
+    def generateLevel(self, spriteBank: dict, inmark: mark.Mark):
+        self.generateTiles(spriteBank, inmark)
+        self.generateMobs(spriteBank, inmark)
+        self.generateWalls(spriteBank, inmark)
         if self.nbWallToGenerate > 0:
-            self.generateWalls(spriteBank, mark)
-        self.generateItems(spriteBank, mark)
+            self.generateWalls(spriteBank, inmark)
+        self.generateItems(spriteBank, inmark)
+        self.decorate(inmark)
+
+    def decorate(self, inmark: mark.Mark):
+        pass
 
     def render(self, window):
         if self.tilesGroup:
@@ -104,12 +110,23 @@ class GameRoom:
 
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
-            for nb in range(self.enemiesToGenerate[mobClass]):
-                x = self.getRandomX()
-                y = self.getRandomY()
-                m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
-                self.enemies.add(m)
-                self.enemiesGenerated.append(m)
+            mobGenInfo = self.enemiesToGenerate[mobClass]
+            nbToGen = mobGenInfo['nb']
+            proba = 1 // mobGenInfo['proba']
+            for nb in range(nbToGen):
+                if random.randint(0, proba - 1) == 0:
+                    x = self.getRandomX()
+                    y = self.getRandomY()
+                    m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
+                    self.enemies.add(m)
+                    self.enemiesGenerated.append(m)
+        # for mobClass in self.enemiesToGenerate:
+        #     for nb in range(self.enemiesToGenerate[mobClass]):
+        #         x = self.getRandomX()
+        #         y = self.getRandomY()
+        #         m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
+        #         self.enemies.add(m)
+        #         self.enemiesGenerated.append(m)
 
     def generateWalls(self, loadedRessource: dict, mark : mark.Mark):
         pass
@@ -131,8 +148,6 @@ class BasicRoom(GameRoom):
         GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
-        self.buildMobs()
-        self.buildItems()
 
     def buildMobs(self):
         self.enemiesToGenerate[mob.Gobelin] = {'nb': 1, "proba": 0.25}
@@ -764,7 +779,7 @@ class TopBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        self.generatedWall.extend(self.fixedWalls)
+
 
 
 
@@ -1289,47 +1304,128 @@ class CastleCenterRoom(GameRoom):
         GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.FloorTiles)
         # self.tilesToGenerate.append(tiles.FlowerGrassTile)
-        self.adjacencies = [Adjacency.LEFT, Adjacency.BOTTOM]
+        self.adjacencies = [Adjacency.BOTTOM]
         self.nbWallToGenerate = 0
         self.buildMobs()
 
-    # def generateTiles(self, spriteBank: dict, mark: mark.Mark):
-    #     self.tilesGroup = sprites.GameSpriteGroup()
-    #     for x in range(self.size):
-    #         for y in range(self.size):
-    #             tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](spriteBank,
-    #                                                                                    self.tilesGroup,
-    #                                                                                    self.xStart + x * config.TILESIZE,
-    #                                                                                    self.yStart + y * config.TILESIZE,
-    #                                                                                    mark)
-    #             self.generatedTiles.append(tile)
-    #             self.tiles.append(tile)
+    def generateTiles(self, spriteBank: dict, mark: mark.Mark):
+        super().generateTiles(spriteBank, mark)
+
+        ignoreCol = self.size // 2
+        for col in range(ignoreCol - 1, ignoreCol + 2):
+            tile = tiles.WallTilesDown(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
+                                  self.yStart + (self.size - 1) * config.TILESIZE, mark, 2)
+            self.generatedTiles.append(tile)
+            self.tiles.append(tile)
+
+
+    def buildItems(self):
+        self.itemsToGenerate[item.Chest] = {"nb": 4, "proba": 1, "type": item.Chest}
+
+    def generateItems(self, spriteBank: dict, mark: mark.Mark):
+        for itemClass in self.itemsToGenerate:
+            itemGenInfo = self.itemsToGenerate[itemClass]
+            nbToGen = itemGenInfo['nb']
+            proba = 1 // itemGenInfo['proba']
+            for nb in range(nbToGen):
+                if random.randint(0, proba - 1) == 0:
+                    x = self.getRandomX()
+                    y = self.getRandomY()
+                    m = itemClass(x, y, self.items, spriteBank, mark, self.textures)
+                    self.items.add(m)
+                    self.itemsGenerated.append(m)
+
+    def decorate(self, inmark: mark.Mark):
+        col = 1
+        row = 2
+        for i in range(len(self.enemiesGenerated) // 2):
+            enemy = self.enemiesGenerated[i]
+            x = self.xStart + col * config.TILESIZE
+            y = self.yStart + row * config.TILESIZE
+            enemy.x = x
+            enemy.y = y
+            enemy.update([self.xStart, self.xStart + self.size * config.TILESIZE, self.yStart, self.yStart + self.size * config.TILESIZE])
+            col += 1
+        col = self.size - 2
+        for i in range(len(self.enemiesGenerated) // 2, len(self.enemiesGenerated)):
+            enemy = self.enemiesGenerated[i]
+            x = self.xStart + col * config.TILESIZE
+            y = self.yStart + row * config.TILESIZE
+            enemy.x = x
+            enemy.y = y
+            enemy.update([self.xStart, self.xStart + self.size * config.TILESIZE, self.yStart, self.yStart + self.size * config.TILESIZE])
+            enemy.image = pygame.transform.flip(enemy.image, True, False).convert()
+            col -= 1
+        row += 1
+        n = len(self.itemsGenerated)
+        col = 4
+        for i in range(n // 2):
+            item = self.itemsGenerated[i]
+            x = self.xStart + col * config.TILESIZE
+            y = self.yStart + row * config.TILESIZE
+            item.x = x
+            item.y = y
+            item.update()
+            col += 1
+        col = self.size // 2
+        col += 2
+        for i in range(n // 2, n):
+            item = self.itemsGenerated[i]
+            x = self.xStart + col * config.TILESIZE
+            y = self.yStart + row * config.TILESIZE
+            item.x = x
+            item.y = y
+            item.update()
+            col += 1
+        w2 = self.size // 2 - 2
+        row = 2
+        for i in range(4):
+            tile = tiles.KnightTaupiqueurTile(sprites.SPRITE_BANK, self.tilesGroup, self.xStart + (i + w2) * config.TILESIZE,
+                                      self.yStart + row * config.TILESIZE, inmark, i)
+            tile.y -= 7
+            self.generatedTiles.append(tile)
+            self.tiles.append(tile)
+
+    def buildMobs(self):
+        self.enemiesToGenerate[mob.DecorationSkeleton] = {'nb': 8, "proba": 1}
 
     def generateWalls(self, spriteBank: dict, mark: mark.Mark):
-        # first two up rows,
-        for row in range(2):
-            for col in range(1, self.size):
-                self.fixedWalls.append(
-                    tiles.WallTilesUp(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
-                                      self.yStart + row * config.TILESIZE, mark, 1))
-
-        row = 2
-        # last up row
+        row = 0
         for col in range(1, self.size):
             self.fixedWalls.append(
                 tiles.WallTilesUp(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
                                   self.yStart + row * config.TILESIZE, mark, 0))
 
+        for row in range(1, 3):
+            for col in range(1, self.size):
+                self.fixedWalls.append(
+                    tiles.WallTilesUp(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
+                                      self.yStart + row * config.TILESIZE, mark, 1))
+
+        row = 1
+        for col in range(0, 5):
+            self.fixedWalls.append(
+                tiles.WallTilesUp(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
+                                  self.yStart + row * config.TILESIZE, mark, 2))
+        for col in range(self.size - 1, self.size - 6, -1):
+            self.fixedWalls.append(
+                tiles.WallTilesUp(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
+                                  self.yStart + row * config.TILESIZE, mark, 2))
+
         # left walls
-        for row in range(1, self.size - 1):
+        for row in range(self.size - 1):
             self.fixedWalls.append(
                 tiles.WallTilesLeft(spriteBank, self.tilesGroup, self.xStart + 0 * config.TILESIZE,
                                   self.yStart + row * config.TILESIZE, mark, 0))
 
-        # top left corner
-        self.fixedWalls.append(
-            tiles.WallTilesTopLeftCorner(spriteBank, self.tilesGroup, self.xStart + 0 * config.TILESIZE,
-                                self.yStart + 0 * config.TILESIZE, mark))
+        # down walls
+        ignoreCol = self.size // 2
+        for col in range(1, self.size - 1):
+            if col >= ignoreCol - 1 and col <= ignoreCol + 1:
+                continue
+            self.fixedWalls.append(
+                tiles.WallTilesDown(spriteBank, self.tilesGroup, self.xStart + col * config.TILESIZE,
+                                  self.yStart + (self.size - 1) * config.TILESIZE, mark, 0))
 
         # down left corner
         self.fixedWalls.append(
@@ -1340,55 +1436,14 @@ class CastleCenterRoom(GameRoom):
         self.fixedWalls.append(
             tiles.WallTilesDownRightCorner(spriteBank, self.tilesGroup, self.xStart + (self.size - 1) * config.TILESIZE,
                                 self.yStart + (self.size - 1) * config.TILESIZE, mark))
-        # up right corner
-        self.fixedWalls.append(
-            tiles.WallTilesUpRightCorner(spriteBank, self.tilesGroup, self.xStart + (self.size - 1) * config.TILESIZE,
-                                self.yStart + (self.size - 1) * config.TILESIZE, mark))
+
+        for row in range(self.size - 1):
+            # WallTilesRight
+            self.fixedWalls.append(
+                tiles.WallTilesRight(spriteBank, self.tilesGroup, self.xStart + (self.size - 1) * config.TILESIZE,
+                                    self.yStart + row * config.TILESIZE, mark, 0))
 
         self.generatedWall.extend(self.fixedWalls)
-        # for y in range(self.size):
-        #     self.fixedWalls.append(
-        #         tiles.BorderTiles(spriteBank, self.tilesGroup, self.xStart + (self.size - 1 ) * config.TILESIZE,
-        #                           self.yStart + y * config.TILESIZE, mark))
-        # for x in range(1, self.size):
-        #     self.fixedWalls.append(
-        #         tiles.BorderTiles(spriteBank, self.tilesGroup, self.xStart + x * config.TILESIZE,
-        #                           self.yStart + 0 * config.TILESIZE, mark))
-        #
-        # for x in range(self.nbWallToGenerate):
-        #     generated = False
-        #     tryb = 0
-        #     brutcap = 100
-        #     while not generated and tryb < brutcap:
-        #         tryb += 1
-        #         wallToGenerate = self.wallsToGenerate[randint(0, len(self.wallsToGenerate) - 1)]
-        #         generateCoordX = randint(2, len(self.physics) - 4)
-        #         generateCoordY = randint(2, len(self.physics) - 4)
-        #
-        #         # Check generation validity
-        #         if self.physics[generateCoordY][generateCoordX] == 0:
-        #             ycheck = wallToGenerate[1];
-        #             xcheck = wallToGenerate[0];
-        #             res = True
-        #             while ycheck >= 0:
-        #                 for x in range(xcheck):
-        #                     if self.physics[generateCoordY - ycheck][generateCoordX - x] == 1:
-        #                         res = False;
-        #                         break;
-        #                 ycheck -= 1;
-        #             if res:
-        #                 ycheck = wallToGenerate[1];
-        #                 generated = True
-        #                 while ycheck >= 0:
-        #                     for x in range(xcheck):
-        #                         self.physics[generateCoordY - ycheck][generateCoordX - x] = 1
-        #                     ycheck -= 1
-        #                 tile = wallToGenerate[2](spriteBank, self.tilesGroup,
-        #                                          self.xStart + generateCoordX * config.TILESIZE,
-        #                                          self.yStart + generateCoordY * config.TILESIZE, mark)
-        #                 self.generatedWall.append(tile)
-        #                 self.tiles.append(tile)
-        # self.generatedWall.extend(self.fixedWalls)
 
 
 class CastleEntrance(GameRoom):

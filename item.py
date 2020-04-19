@@ -74,3 +74,13 @@ class Scroll(Item):
             for scrollText in self.scrollTexts:
                 self.texts.render(scrollText, x, y, self.color)
                 y += 16
+
+class Chest(Item):
+    def __init__(self, x, y, group: sprites.GameSpriteGroup,
+                 spriteBank: dict, mark: Mark, textures: pygame.image, texts: text.Texts = None):
+        Item.__init__(self, x, y, group, spriteBank, mark, textures,
+                      spriteBank['dungeon']['items']['chest'], texts)
+        super().update()
+
+    def render(self, screen):
+        screen.blit(self.image, (self.rect.x, self.rect.y))
