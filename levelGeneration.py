@@ -192,7 +192,6 @@ class BasicRoom(GameRoom):
             proba = 1 // itemGenInfo['proba']
             for nb in range(nbToGen):
                 if random.randint(0, proba - 1) == 0:
-                    # print("JYHTGFRDES")
                     x = self.getRandomX()
                     y = self.getRandomY()
                     if itemGenInfo['type'] == item.Scroll:
@@ -344,8 +343,7 @@ class CossWallRoom(GameRoom):
 
     def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
         GameRoom.__init__(self, textures, size, line, column, texts, player)
-        self.tilesToGenerate.append(tiles.GrassTile)
-        self.tilesToGenerate.append(tiles.FlowerGrassTile)
+        self.tilesToGenerate.append(tiles.FloorTiles)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
         self.nbWallToGenerate = 1
         self.adjacencies = [Adjacency.RIGHT, Adjacency.LEFT, Adjacency.BOTTOM, Adjacency.TOP]
@@ -716,8 +714,7 @@ class LeftBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class TopBorder(GameRoom):
@@ -840,8 +837,7 @@ class BotBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class RightBorder(GameRoom):
@@ -890,8 +886,7 @@ class RightBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class TopLeftBorder(GameRoom):
@@ -948,8 +943,7 @@ class TopLeftBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class TopRightBorder(GameRoom):
@@ -1075,8 +1069,7 @@ class TopRightBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class BottomRightBorder(GameRoom):
@@ -1133,8 +1126,7 @@ class BottomRightBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class BottomLeftBorder(GameRoom):
@@ -1191,8 +1183,7 @@ class BottomLeftBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+
 
 
 class SpawnTopLeftBorder(TopLeftBorder):
@@ -1258,7 +1249,7 @@ class SpawnTopLeftBorder(TopLeftBorder):
             "You will find more scrolls like",
             "this one through your adventure.",
             "Be careful, Roger."],
-        "delaySeconds": config.FPS * 20,
+        "delaySeconds": config.FPS * 15,
         "screenX": config.TILESIZE,
         "screenY": config.TILESIZE,
         "color": (255, 255, 255),
@@ -1271,7 +1262,7 @@ class SpawnTopLeftBorder(TopLeftBorder):
             proba = 1 // itemGenInfo['proba']
             for nb in range(nbToGen):
                 if random.randint(0, proba - 1) == 0:
-                    # print("JYHTGFRDES")
+
                     x = self.xStart + 9 * config.TILESIZE + 5
                     y = self.yStart + 5 * config.TILESIZE
                     if itemGenInfo['type'] == item.Scroll:
@@ -1445,23 +1436,20 @@ class CastleCenterRoom(GameRoom):
 
         self.generatedWall.extend(self.fixedWalls)
 
-
 class CastleEntrance(GameRoom):
 
     def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
         GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.FloorTiles)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
-        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM]
+        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM,Adjacency.LEFT, Adjacency.RIGHT]
 
         self.nbWallToGenerate = 0;
-        self.buildMobs()
 
-    def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 1
+
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
-        print(loadedRessources["dungeon"])
+
         for y in range(self.size // 2 - 2):
             for val in range(3):
                 self.fixedWalls.append(

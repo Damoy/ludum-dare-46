@@ -18,8 +18,7 @@ class Item(sprites.GameSprite):
         self.texts = texts
         self.activated = False
         self.listForDestruction = []
-        # print(startImage)
-        # print(startImage.get_at((0, 0)))
+
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()

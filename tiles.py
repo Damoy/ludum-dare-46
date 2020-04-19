@@ -15,13 +15,13 @@ class Tile(sprites.GameSprite):
     def update(self):
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.x - self.mark.getY()
-        # print("x:", x, ";y:", y)
+
 
 
 class GrassTile(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
         Tile.__init__(self, loadedRessources['tiles']['grass'], group, x, y,mark)
-        # print("x:", x, ";y:", y)
+
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()
@@ -32,7 +32,6 @@ class FlowerGrassTile(Tile):
     def __init__(self, loadedRessources: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
         flowerSet = randint(0, len(loadedRessources['tiles']['grassFlower'])-1)
         Tile.__init__(self, loadedRessources['tiles']['grassFlower'][flowerSet][randint(0, len(loadedRessources['tiles']['grassFlower'][flowerSet]) - 1)], group, x, y, mark)
-        # print("x:", x, ";y:", y)
 
     def update(self):
         self.rect.x = self.x - self.mark.getX()

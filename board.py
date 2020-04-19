@@ -54,26 +54,30 @@ class Board:
             self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w, self.texts, self.player)
             self.boardGrid[len(self.boardGrid[0]) - 1][w].generateLevel(self.spriteBank, self.mark)
 
-        for y in range(1, width - 1):
-            for x in range(1, height - 1):
-                room = self.generateRoom(y, x, size)
-                self.boardGrid[y][x] = room
-        print(self.boardGrid[9][0])
-
         w2 = width // 2
         h2 = height // 2
-        # w2 = 0
-        # h2 = 0
-        print("w2:", w2, ";h2:", h2)
-        self.boardGrid[h2][w2] = CastleEntrance(self.textures, size, w2, h2, self.texts, self.player)
+        w3 = w2
+        h3 = h2 + 1
+
+
+        self.boardGrid[h2][w2] = CastleCenterRoom(self.textures, size, h2, w2, self.texts, self.player)
         self.boardGrid[h2][w2].generateLevel(self.spriteBank, self.mark)
-        print(self.boardGrid[h2][w2])
+        self.boardGrid[h3][w3] = CastleEntrance(self.textures, size, h3, w3, self.texts, self.player)
+        self.boardGrid[h3][w3].generateLevel(self.spriteBank, self.mark)
+
+        for y in range(1, width - 1):
+            for x in range(1, height - 1):
+                if not (y == h2 and x == w2) and not (y == h3 and x == w3):
+                    room = self.generateRoom(y, x, size)
+                    self.boardGrid[y][x] = room
+
+
 
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
 
-        rooms = [BasicRoom, VCorridorWallRoom,RuinedWildRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom];
+        rooms = [BasicRoom, VCorridorWallRoom,RuinedWildRoom, HCorridorWallRoom, CossWallRoom, VCorridorWallRoom];
         newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts, self.player)
 
         possibleTop = Adjacency.ALL in newRoom.adjacencies or (((Adjacency.TOP in newRoom.adjacencies and
