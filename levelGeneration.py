@@ -12,7 +12,6 @@ class Adjacency(Enum):
     BOTTOM = 1
     LEFT = 2
     RIGHT = 3
-    ALL = 4
 
 
 class GameRoom:
@@ -134,6 +133,9 @@ class TreeRoom(GameRoom):
         self.nbWallToGenerate = 8
         self.size = size
 
+    def buildMobs(self):
+        self.enemiesToGenerate[mob.Gobelin] = 1
+
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
         for x in range(self. size):
@@ -193,7 +195,7 @@ class RuinedWildRoom(GameRoom):
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.wallTiles))
-        self.nbWallToGenerate = 10;
+        self.nbWallToGenerate = 10
         self.buildMobs()
 
     def buildMobs(self):
@@ -257,8 +259,8 @@ class CossWallRoom(GameRoom):
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
+        self.nbWallToGenerate = 1
         self.adjacencies = [Adjacency.RIGHT, Adjacency.LEFT, Adjacency.BOTTOM, Adjacency.TOP]
-
         self.nbWallToGenerate = 1;
         self.buildMobs()
 

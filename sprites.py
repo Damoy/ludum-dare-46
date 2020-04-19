@@ -109,6 +109,58 @@ def loadSpriteBank(textures: pygame.image):
     grassBlocks.append(subImage(textures, 257, 55, 24, 21))
     tilesBank['grassBlock'] = grassBlocks
 
+    dungeonBank = {}
+    dungeonWalls = {}
+    dungeonWalls['left'] = []
+    dungeonWalls['left'].append(subImage(textures, 130, 212, 16, 16))
+    dungeonWalls['left'].append(subImage(textures, 130, 228, 16, 16))
+    dungeonWalls['downLeftCorner'] = subImage(textures, 130, 276, 16, 16)
+    dungeonWalls['upLeftCorner'] = pygame.transform.flip(dungeonWalls['downLeftCorner'], False, True).convert()
+    dungeonWalls['upRightCorner'] = pygame.transform.flip(dungeonWalls['upLeftCorner'], True, False).convert()
+    dungeonWalls['downRightCorner'] = pygame.transform.flip(dungeonWalls['downLeftCorner'], True, False).convert()
+    dungeonWalls['up'] = []
+    dungeonWalls['up'].append(subImage(textures, 162, 212, 16, 16))
+    dungeonWalls['up'].append(subImage(textures, 146, 212, 16, 16))
+    dungeonWalls['up'].append(subImage(textures, 226, 212, 16, 16))
+    dungeonWalls['up'].append(subImage(textures, 258, 212, 16, 16))
+    dungeonWalls['down'] = []
+    dungeonWalls['down'].append(subImage(textures, 146, 275, 16, 16))
+    dungeonWalls['down'].append(subImage(textures, 178, 275, 16, 16))
+    dungeonWalls['right'] = []
+    for dungeonWallLeftFrame in dungeonWalls['left']:
+        dungeonWalls['right'].append(pygame.transform.flip(dungeonWallLeftFrame, True, False).convert())
+
+    dungeonTiles = {}
+    dungeonTiles['floor'] = []
+    dungeonTiles['floor'].append(subImage(textures, 178, 244, 16, 16))
+    dungeonTiles['floor'].append(subImage(textures, 226, 229, 16, 16))
+    dungeonTiles['floor'].append(subImage(textures, 258, 276, 16, 16))
+
+    dungeonItems = {}
+    dungeonItems['redPotion'] = subImage(textures, 181, 294, 10, 11)
+    dungeonItems['bluePotion'] = subImage(textures, 150, 295, 8, 10)
+    dungeonItems['key'] = subImage(textures, 165, 296, 11, 8)
+    dungeonItems['chest'] = subImage(textures, 165, 346, 10, 10)
+    dungeonItems['gold'] = subImage(textures, 197, 327, 10, 10)
+
+    dungeonMobs = {}
+    skeleton = {}
+    skeleton['right'] = []
+    skeleton['right'].append(subImage(textures, 210, 180, 16, 16))
+    skeleton['right'].append(subImage(textures, 226, 180, 16, 16))
+    skeleton['right'].append(subImage(textures, 242, 180, 16, 16))
+    skeleton['left'] = []
+    for skeletonRightFrame in skeleton['right']:
+        skeleton['left'].append(pygame.transform.flip(skeletonRightFrame, True, False).convert())
+    dungeonMobs['skeleton'] = skeleton
+
+    dungeonBank['walls'] = dungeonWalls
+    dungeonBank['tiles'] = dungeonTiles
+    dungeonBank['items'] = dungeonItems
+    dungeonBank['mobs'] = dungeonMobs
+    spriteBank['dungeon'] = dungeonBank
+
+
     entitiesBank = {}
     entitiesBank['potion'] = subImage(textures, 0, 51, 9, 13)
     entitiesBank['seed'] = subImage(textures, 10, 13, 7, 11)
