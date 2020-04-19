@@ -24,7 +24,7 @@ class Game:
         self.mark = Mark(0, 0)
         self.sounds = sound.Sounds()
         self.allSprites = sprites.GameSpriteGroup()
-        self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites,
+        self.player = Player(self.window.get(), self.textures, 5 * config.TILESIZE, 5 * config.TILESIZE, self.allSprites,
                              self.spriteBank, self.mark, self.sounds, self)
         self.board = Board(self.window, self.textures, self.spriteBank, self.mark, self.texts, self.player)
         self.board.initBoard(10, 10, 16)

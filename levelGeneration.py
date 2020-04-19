@@ -1087,6 +1087,7 @@ class BottomRightBorder(GameRoom):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + (self.size - 1) * config.TILESIZE,
                                   self.yStart + y * config.TILESIZE, mark))
+
         for x in range(self.size - 1):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE,
@@ -1197,10 +1198,98 @@ class SpawnTopLeftBorder(TopLeftBorder):
         self.adjacencies = [Adjacency.LEFT, Adjacency.BOTTOM]
         self.nbWallToGenerate = 0
         self.buildMobs()
+        self.buildItems()
 
     def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
         GameRoom.generateTiles(self, loadedRessources,mark)
-        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 5 * config.TILESIZE, self.yStart + 5 * config.TILESIZE,
-                                                                   mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 5 * config.TILESIZE, self.yStart + 5 * config.TILESIZE, mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 5 * config.TILESIZE,
+                                                self.yStart + 4 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 4 * config.TILESIZE,
+                                                self.yStart + 4 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 4 * config.TILESIZE,
+                                                self.yStart + 5 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 5 * config.TILESIZE,
+                                                self.yStart + 6 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 6 * config.TILESIZE,
+                                                self.yStart + 5 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 6 * config.TILESIZE,
+                                                self.yStart + 6 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 7 * config.TILESIZE,
+                                                self.yStart + 7 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 7 * config.TILESIZE,
+                                                self.yStart + 5 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 6 * config.TILESIZE,
+                                                self.yStart + 4 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 9 * config.TILESIZE,
+                                                self.yStart + 5 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 10 * config.TILESIZE,
+                                                self.yStart + 3 * config.TILESIZE,
+                                                mark))
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 3 * config.TILESIZE,
+                                                self.yStart + 8 * config.TILESIZE,
+                                                mark))
+
+    def buildItems(self):
+        self.itemsToGenerate[item.Scroll] = {"nb": 1, "proba": 1, "type": item.Scroll, "content":
+            ["Hello Roger the TV lover !",
+            "You have been teleported to the age",
+            "of Le Roi Arthur because of a magic",
+            "remote control. Yes, this is an",
+            "astonishing news.",
+            "You have to keep it alive and",
+            "bring it to the castle."
+            "You will find more scrolls like",
+            "this one through your adventure.",
+            "Be careful, Roger."],
+        "delaySeconds": config.FPS * 20,
+        "screenX": config.TILESIZE,
+        "screenY": config.TILESIZE,
+        "color": (255, 255, 255),
+        "player": self.player}
+
+    def generateItems(self, spriteBank: dict, mark: mark.Mark):
+        for itemClass in self.itemsToGenerate:
+            itemGenInfo = self.itemsToGenerate[itemClass]
+            nbToGen = itemGenInfo['nb']
+            proba = 1 // itemGenInfo['proba']
+            for nb in range(nbToGen):
+                if random.randint(0, proba - 1) == 0:
+                    # print("JYHTGFRDES")
+                    x = self.xStart + 9 * config.TILESIZE + 5
+                    y = self.yStart + 5 * config.TILESIZE
+                    if itemGenInfo['type'] == item.Scroll:
+                        screenX = itemGenInfo['screenX']
+                        screenY = itemGenInfo['screenY']
+                        color = itemGenInfo['color']
+                        scrollTexts = itemGenInfo['content']
+                        delaySeconds = itemGenInfo['delaySeconds']
+                        player = itemGenInfo['player']
+                        m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts,
+                                      scrollTexts, delaySeconds, screenX, screenY, color, player)
+                    else:
+                        m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts)
+                    self.items.add(m)
+                    self.itemsGenerated.append(m)
+
+    def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
+
+        TopLeftBorder.generateWalls(self, loadedRessources, mark)
+        self.fixedWalls.append(
+                tiles.WallTiles(loadedRessources, self.tilesGroup, self.xStart + 7 * config.TILESIZE,
+                                  self.yStart + 2 * config.TILESIZE, mark))
+
+        self.generatedWall.extend(self.fixedWalls[:-1])
+
 
 
