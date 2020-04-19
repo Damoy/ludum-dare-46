@@ -7,7 +7,7 @@ from board import Board
 from mark import Mark
 import sprites
 import config
-
+import sound
 
 class Game:
     def __init__(self):
@@ -23,10 +23,10 @@ class Game:
         self.board = Board(self.window, self.textures, self.spriteBank, self.mark)
         self.board.initBoard(10, 10, 10);
         self.allSprites = sprites.GameSpriteGroup()
-        self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites, self.spriteBank, self.mark)
+        self.sounds = sound.Sounds()
+        self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites, self.spriteBank, self.mark, self.sounds)
 
     def gameLoop(self):
-
         self.isRunning = True
         while self.isRunning:
             self.clock.tick(config.FPS)
@@ -39,7 +39,6 @@ class Game:
 
 
     def update(self):
-
         self.board.update()
         if not self.checkCollide(self.player):
             self.player.handleInput()
@@ -47,22 +46,43 @@ class Game:
             self.player.y += -self.player.dy
             self.player.x += -self.player.dx
 
+        self.cleanMobs()
 
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
+        mobsDico = self.getScreenMobs()
+        # print("mobs: ", mobsDico)
 
-        self.allSprites.update()
-
+        self.player.update(mobsDico)
         self.updateMark()
 
         keys = pygame.key.get_pressed()
         events = pygame.event.get()
 
-
-
-
         if self.player.userEnded:
             self.isRunning = False
+
+    def getScreenMobs(self):
+        mobs = {}
+        for line in self.board.boardGrid:
+            for col in line:
+                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+                    mobs[col] = {"mobsGen": col.enemiesGenerated} # "mobsDestroy": col.enemiesToDestroy
+        return mobs
+
+    def cleanMobs(self):
+        for line in self.board.boardGrid:
+            for col in line:
+                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+
+                    for mob in col.enemiesToDestroy:
+                        if mob in col.enemiesGenerated:
+                            self.sounds.playHitSound()
+                            col.enemiesGenerated.remove(mob)
+                            col.enemies.remove(mob) # should be in list
+                    col.enemiesToDestroy.clear()
 
     def checkCollide(self, player):
         for line in self.board.boardGrid:
@@ -73,6 +93,15 @@ class Game:
                     for mob in col.enemiesGenerated:
                         if pygame.sprite.collide_rect(mob, player):
                             player.collideMob(mob)
+
+                    for wall in col.generatedWall:
+                        for mob in col.enemiesGenerated:
+                            if pygame.sprite.collide_rect(mob, wall):
+                                mob.collideWall()
+
+                        if pygame.sprite.collide_rect(player, wall):
+                            return True
+
                     for wall in col.generatedWall:
                         if pygame.sprite.collide_rect(player, wall):
                             return True
@@ -101,7 +130,7 @@ class Game:
         self.screen.fill((255, 255, 255))
         self.board.render()
         self.player.render()
-        self.allSprites.draw(self.screen)
+        # self.allSprites.draw(self.screen)
         self.window.render()
 
     def compute_penetration(self, block, old_rect, new_rect):

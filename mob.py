@@ -8,7 +8,8 @@ import random
 
 class Mob(sprites.GameSprite):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict, mark: Mark, textures: pygame.image, startImage: pygame.image):
+                 spriteBank: dict, mark: Mark, textures: pygame.image, startImage: pygame.image,
+                 life, damage):
         sprites.GameSprite.__init__(self, startImage, group)
         self.mark = mark
         self.dx = 0;
@@ -18,19 +19,30 @@ class Mob(sprites.GameSprite):
         self.x = x
         self.y = y
         self.dv = 1
-        self.damage = 1;
+        self.damage = damage
+        self.life = life
         self.spriteBank = spriteBank
         self.directions = {"x": Direction.NONE, "y": Direction.NONE}
         self.animation = self.loadAnimation()
         self.updateDirectionTickCounter = TickCounter(config.FPS >> 1, False)
         self.updateDirectionTickCounter.start()
         self.pxMoveCount = 0
+        self.alive = True
 
     def collideWall(self):
         self.x += -self.dx
         self.y += -self.dy
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
+
+    def getBox(self):
+        return pygame.rect.Rect(self.x, self.y, config.TILESIZE, config.TILESIZE)
+
+    def render(self, screen):
+        # b = self.getBox()
+        # box = pygame.rect.Rect(b.x - self.mark.x, b.y - self.mark.y, 16, 16)
+        # pygame.draw.rect(screen, (0, 255, 0), box)
+        pass
 
     def loadAnimation(self):
         return None
@@ -126,7 +138,8 @@ class Gobelin(Mob):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict, mark: Mark, textures: pygame.image):
         Mob.__init__(self, x, y, group, spriteBank, mark, textures,
-                     spriteBank['entities']['characters']['enemies']['gobelin']['down'])
+                     spriteBank['entities']['characters']['enemies']['gobelin']['down'],
+                     1, 1)
 
     def loadAnimation(self):
         gobBank = self.spriteBank['entities']['characters']['enemies']['gobelin']
@@ -142,7 +155,8 @@ class Knight1(Mob):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict, mark: Mark, textures: pygame.image):
         Mob.__init__(self, x, y, group, spriteBank, mark, textures,
-                     spriteBank['entities']['characters']['enemies']['knight1']['right'][0])
+                     spriteBank['entities']['characters']['enemies']['knight1']['right'][0],
+                     2, 1)
 
     def loadAnimation(self):
         knightBank = self.spriteBank['entities']['characters']['enemies']['knight1']

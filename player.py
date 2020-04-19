@@ -7,9 +7,10 @@ import config
 import gameTime
 import mark
 import math
+from pygame.rect import Rect
 
 class Attack:
-    def __init__(self, x, y, w, h, color, screen, start, stop):
+    def __init__(self, x, y, w, h, color, screen, start, stop, mark: mark.Mark, dmg):
         self.x = x
         self.y = y
         self.w = w
@@ -19,21 +20,46 @@ class Attack:
         self.start = start
         self.stop = stop
         self.shouldRender = False
+        self.box = None
+        self.mark = mark
+        self.dmg = dmg
+
+    def collide(self, rect2: pygame.rect.Rect):
+        if self.box is None or rect2 is None:
+            return False
+        return self.box.colliderect(rect2)
 
     # collision todo
-    def update(self):
-        pass
+    def update(self, mobsDico: dict):
+        self.box = self.getBox()
+        for room in mobsDico:
+            mobsGenerated = mobsDico[room]['mobsGen']
+            # mobsToDestroy = mobsDico[room]['mobsDestroy']
+            for mob in mobsGenerated:
+                if self.collide(mob.getBox()):
+                    mob.life -= self.dmg
+                    if mob.life <= 0:
+                        mob.alive = False
+                        room.enemiesToDestroy.append(mob)
 
     def render(self):
         if self.shouldRender:
             pygame.draw.arc(self.screen, self.color,
-                [self.x, self.y, self.w, self.h], self.start, self.stop)
+                [self.x - self.mark.x, self.y - self.mark.y, self.w, self.h], self.start, self.stop)
+            # print("[", self.x, ",", self.y, ",", self.w, ",", self.h)
+            # pygame.draw.rect(self.screen, (255, 0, 0), pygame.rect.Rect(self.x - self.mark.x, self.y - self.mark.y, self.w, self.h))
             self.shouldRender = False
             # print("treggfd:", "x:", self.x, ";y:", self.y, ";w:", self.w, ";h:", self.h, ";s:", self.start, ";stop:", self.stop)
 
+    def getBox(self):
+        box = pygame.rect.Rect(self.x, self.y, 16, 16)
+        # print("attack box:", box)
+        return box
+
+
 class Player(sprites.GameSprite):
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict, mark: mark):
+                 spriteBank: dict, mark: mark, sounds):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
         self.screen = screen
         self.mark = mark
@@ -60,13 +86,22 @@ class Player(sprites.GameSprite):
         self.isAttacking = False
         self.canAttack = True
         self.cdAttackTickCounter = gameTime.TickCounter(5, False)
+        self.damage = 1
         self.attackArcCircle = Attack(0, 0, config.TILESIZE, config.TILESIZE,
-                                      (255, 255, 255), self.screen, 0, 0)
+                                      (255, 255, 255), self.screen, 0, 0, self.mark, self.damage)
         self.attackDirections = {"x": self.directions["x"], "y": self.directions["y"]}
         self.updateHandleAttack()
         self.oldPos = (0, 0)
+        self.sounds = sounds
+
+    def getAttackBox(self):
+        if not self.isAttacking:
+            return None
+        return self.attackArcCircle.getBox()
 
     def render(self):
+        # image
+        self.screen.blit(self.image, (self.rect.x, self.rect.y))
         # life
         w = self.life * config.TILESIZE >> 1
         h = config.TILESIZE >> 1
@@ -75,18 +110,20 @@ class Player(sprites.GameSprite):
         if self.attackArcCircle.shouldRender:
             self.attackArcCircle.render()
 
-    def update(self):
+    def update(self, mobsDico):
         # self.handleInput()
-        self.handleAttack()
+        self.handleAttack(mobsDico)
 
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 
-    def handleAttack(self):
+    def handleAttack(self, mobsDico):
         # attack arc circle
         self.updateCdAttackTickCounter()
         if self.isAttacking:
+            # self.sounds.playHitSound2()
             self.updateHandleAttack()
+            self.attackArcCircle.update(mobsDico)
 
     def updateHandleAttack(self):
         start = self.attackArcCircle.start
@@ -108,18 +145,18 @@ class Player(sprites.GameSprite):
             elif xdir == Direction.RIGHT and ydir == Direction.DOWN:
                 start = 3 * (math.pi / 2)
                 stop = 2 * math.pi
-            x = self.rect.x - 8 if xdir == Direction.LEFT else self.rect.x + 6
-            y = self.rect.y - 8 if ydir == Direction.UP else self.rect.y + 6
+            x = self.x - 16 if xdir == Direction.LEFT else self.x + 12
+            y = self.y - 16 if ydir == Direction.UP else self.y + 12
         elif xdir is not Direction.NONE and ydir is Direction.NONE:
             start = 3 * math.pi / 4 if xdir == Direction.LEFT else -math.pi / 4
             stop = -3 * math.pi / 4 if xdir == Direction.LEFT else math.pi / 4
-            x = self.rect.x - 8 if xdir == Direction.LEFT else self.rect.x + 6
-            y = self.rect.y
+            x = self.x - 16 if xdir == Direction.LEFT else self.x + 12
+            y = self.y
         elif xdir is Direction.NONE and ydir is not Direction.NONE:
             start = math.pi / 4 if ydir == Direction.UP else 5 * math.pi / 4
             stop = 3 * math.pi / 4 if ydir == Direction.UP else 7 * math.pi / 4
-            x = self.rect.x - 1
-            y = self.rect.y - 8 if ydir == Direction.UP else self.rect.y + 6
+            x = self.x - 2
+            y = self.y - 16 if ydir == Direction.UP else self.y + 12
         self.attackArcCircle.x = x
         self.attackArcCircle.y = y
         self.attackArcCircle.start = start
@@ -303,7 +340,6 @@ class Player(sprites.GameSprite):
 
     def collideMob(self, mob):
         self.life -= mob.damage
-        print("colision")
-
+        # print("colision")
         self.x -= self.dx
         self.y -= self.dy
