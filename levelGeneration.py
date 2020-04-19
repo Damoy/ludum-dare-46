@@ -19,7 +19,8 @@ class Adjacency(Enum):
 
 
 class GameRoom:
-    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        self.player = player
         self.textures = textures
         self.fixedTiles = []
         # Wall
@@ -114,8 +115,8 @@ class GameRoom:
         pass
 
 class BasicRoom(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
-        GameRoom.__init__(self, textures, size, line, column, texts)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.buildMobs()
@@ -127,7 +128,22 @@ class BasicRoom(GameRoom):
         self.enemiesToGenerate[mob.Skeleton] = {'nb': 1, "proba": 0.25}
 
     def buildItems(self):
-        self.itemsToGenerate[item.Scroll] = {"nb": 1, "proba": 0.20, "content": "ZIZOU"}
+        self.itemsToGenerate[item.Scroll] = {"nb": 1, "proba": 1, "type": item.Scroll, "content":
+            ["Hello Roger the TV lover !",
+            "You have been teleported to the age",
+            "of Le Roi Arthur because of a magic",
+            "remote control. Yes, this is an",
+            "astonishing news.",
+            "You have to keep it alive and",
+            "bring it to the castle."
+            "You will find more scrolls like",
+            "this one through your adventure.",
+            "Be careful, Roger."],
+        "delaySeconds": config.FPS * 10,
+        "screenX": config.TILESIZE,
+        "screenY": config.TILESIZE,
+        "color": (255, 255, 255),
+        "player": self.player}
 
     def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
         self.tilesGroup = sprites.GameSpriteGroup()
@@ -160,8 +176,15 @@ class BasicRoom(GameRoom):
                     # print("JYHTGFRDES")
                     x = self.getRandomX()
                     y = self.getRandomY()
-                    if 'content' in itemGenInfo:
-                        m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts, itemGenInfo['content'])
+                    if itemGenInfo['type'] == item.Scroll:
+                        screenX = itemGenInfo['screenX']
+                        screenY = itemGenInfo['screenY']
+                        color = itemGenInfo['color']
+                        scrollTexts = itemGenInfo['content']
+                        delaySeconds = itemGenInfo['delaySeconds']
+                        player = itemGenInfo['player']
+                        m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts,
+                                      scrollTexts, delaySeconds, screenX, screenY, color, player)
                     else:
                         m = itemClass(x, y, self.items, spriteBank, mark, self.textures, self.texts)
                     self.items.add(m)
@@ -169,8 +192,8 @@ class BasicRoom(GameRoom):
 
 
 class TreeRoom(GameRoom):
-    def __init__(self, textures: pygame.image,size, line, column, texts: text.Texts):
-        GameRoom.__init__(self, textures,size, line, column, texts)
+    def __init__(self, textures: pygame.image,size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures,size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 2, tiles.TreeTiles))
@@ -233,8 +256,8 @@ class TreeRoom(GameRoom):
 
 
 class RuinedWildRoom(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column):
-        GameRoom.__init__(self, textures, size, line, column)
+    def __init__(self, textures: pygame.image, size, line, column, player):
+        GameRoom.__init__(self, textures, size, line, column, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.wallTiles))
@@ -298,8 +321,8 @@ class RuinedWildRoom(GameRoom):
 
 class CossWallRoom(GameRoom):
     # Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
-        GameRoom.__init__(self, textures, size, line, column, texts)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
@@ -396,8 +419,8 @@ class CossWallRoom(GameRoom):
         self.generatedWall.extend(self.fixedWalls)
 
 class HCorridorWallRoom(GameRoom):
-    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
-        GameRoom.__init__(self, textures, size, line, column, texts)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
@@ -500,8 +523,8 @@ class HCorridorWallRoom(GameRoom):
 
 class VCorridorWallRoom(GameRoom):
     # Todo rename cette
-    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
-        GameRoom.__init__(self, textures, size, line, column, texts)
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))

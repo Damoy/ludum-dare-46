@@ -13,7 +13,7 @@ TILE_SIZE = 16
 
 class Board:
     def __init__(self, window: Window, textures: pygame.image, spriteBank: dict, mark: mark.Mark,
-                 texts: text.Texts):
+                 texts: text.Texts, player):
         self.mark = mark
         self.window = window
         self.textures = textures
@@ -25,6 +25,7 @@ class Board:
         self.tilesGroup = sprites.GameSpriteGroup()
         self.boardGrid = []
         self.texts = texts
+        self.player = player
 
 
     def initBoard(self, width, height,size):
@@ -39,8 +40,9 @@ class Board:
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [BasicRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts)
+        rooms = [BasicRoom]
+        # rooms = [BasicRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom];
+        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts, self.player)
 
         possibleTop = Adjacency.ALL in newRoom.adjacencies or (((Adjacency.TOP in newRoom.adjacencies and
                                                                 not (line == 0)) and (
@@ -108,50 +110,6 @@ class Board:
                                                                                     self.boardGrid[line][
                                                                                         column - 1].adjacencies
                                     or Adjacency.ALL in self.boardGrid[line][column - 1].adjacencies))))
-
-
-        if(column == 0 and line == 0):
-            #
-            print("haut :" + str(self.boardGrid[3][4]))
-            print("g :" + str(self.boardGrid[4][3]))
-            print("b: " + str(self.boardGrid[5][4]))
-            print("d : " + str(self.boardGrid[4][5]))
-            print(Adjacency.ALL in newRoom.adjacencies or (((Adjacency.TOP in newRoom.adjacencies and
-                                                                not (line == 0)) and (
-                                                                           self.boardGrid[line - 1][column] is None or
-                                                                           Adjacency.ALL in self.boardGrid[line - 1][
-                                                                               column].adjacencies or Adjacency.BOTTOM in
-                                                                           self.boardGrid[line - 1][
-                                                                               column].adjacencies))
-                                                               or not (Adjacency.TOP in newRoom.adjacencies) and (
-                                                                           (not (line == len(self.boardGrid) - 1))
-                                                                           and ((self.boardGrid[line + 1][
-                                                                                     column] is None or not Adjacency.BOTTOM in
-                                                                                                            self.boardGrid[
-                                                                                                                line + 1][
-                                                                                                                column].adjacencies)))))
-            print((((Adjacency.TOP in newRoom.adjacencies and
-                                                             not (line == 0)) and (
-                                                                    self.boardGrid[line - 1][column] is None or
-                                                                    Adjacency.ALL in self.boardGrid[line - 1][
-                                                                        column].adjacencies or Adjacency.BOTTOM in
-                                                                    self.boardGrid[line - 1][
-                                                                        column].adjacencies))
-                                                           or not (Adjacency.TOP in newRoom.adjacencies) and (
-                                                                   (not (line == len(self.boardGrid) - 1))
-                                                                   and ((self.boardGrid[line + 1][
-                                                                             column] is None or not Adjacency.BOTTOM in
-                                                                                                    self.boardGrid[
-                                                                                                        line + 1][
-                                                                                                        column].adjacencies)))))
-            print(newRoom)
-            print(possibleLEFT)
-            print(possibleRight)
-            print(possibleBottom)
-            print(possibleTop)
-            print(Adjacency.ALL in newRoom.adjacencies)
-            print(newRoom.adjacencies)
-            #print(self.boardGrid[line - 1][column].adjacencies)
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 

@@ -3,6 +3,7 @@ import sprites
 import text
 from mark import Mark
 import config
+import gameTime
 
 class Item(sprites.GameSprite):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
@@ -16,6 +17,7 @@ class Item(sprites.GameSprite):
         self.mark = mark
         self.texts = texts
         self.activated = False
+        self.listForDestruction = []
         # print(startImage)
         # print(startImage.get_at((0, 0)))
 
@@ -29,16 +31,46 @@ class Item(sprites.GameSprite):
     def activate(self):
         self.activated = True
 
+    def getBox(self):
+        return pygame.rect.Rect(self.x, self.y, config.TILESIZE, config.TILESIZE)
+
 class Scroll(Item):
     def __init__(self, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict, mark: Mark, textures: pygame.image,
-                 texts: text.Texts, scrollText: str):
+                 texts: text.Texts, scrollTexts,
+                 delaySeconds, screenX, screenY, color, player):
         Item.__init__(self, x, y, group, spriteBank, mark, textures,
                       spriteBank['entities']['scroll'], texts)
-        self.scrollText = scrollText
+        self.scrollTexts = scrollTexts
+        self.listForDestruction = None
+        self.delaySeconds = delaySeconds
+        self.destroyTimeTickCounter = gameTime.TickCounter(self.delaySeconds, False)
+        self.screenX = screenX
+        self.screenY = screenY
+        self.color = color
+        self.player = player
+
+    def activate(self):
+        super().activate()
+        self.destroyTimeTickCounter.start()
+        self.player.setRenderingTextMod(True)
+        self.player.game.setRenderingText(True)
+
+
+    def update(self):
+        super().update()
+        self.destroyTimeTickCounter.update()
+        if self.destroyTimeTickCounter.hasStarted() and self.destroyTimeTickCounter.hasReachedEnd():
+            self.activated = False
+            self.listForDestruction.append(self)
+            self.player.setRenderingTextMod(False)
+            self.player.game.setRenderingText(False)
 
     def render(self, window):
         super().render(window)
         if self.activated:
-            x, y = self.texts.getMiddleCoords(self.scrollText)
-            self.texts.render(self.scrollText, x, y, (255, 255, 255))
+            x = self.screenX
+            y = self.screenY
+            for scrollText in self.scrollTexts:
+                self.texts.render(scrollText, x, y, self.color)
+                y += 16

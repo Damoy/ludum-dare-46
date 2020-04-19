@@ -23,23 +23,33 @@ class Attack:
         self.mark = mark
         self.dmg = dmg
 
-    def collide(self, rect2: pygame.rect.Rect):
+    def attackCollide(self, rect2: pygame.rect.Rect):
         if self.box is None or rect2 is None:
             return False
         return self.box.colliderect(rect2)
 
-    # collision todo
-    def update(self, mobsDico: dict):
+    def collide(self, rect2: pygame.rect.Rect):
+        r = pygame.rect.Rect(self.x, self.y, self.w, self.h)
+        return r.colliderect(rect2)
+
+    def update(self, mobsItemsDico: dict):
         self.box = self.getBox()
-        for room in mobsDico:
-            mobsGenerated = mobsDico[room]['mobsGen']
-            # mobsToDestroy = mobsDico[room]['mobsDestroy']
+        for room in mobsItemsDico:
+            # player - mob collision
+            mobsGenerated = mobsItemsDico[room]['mobsGen']
             for mob in mobsGenerated:
-                if self.collide(mob.getBox()):
+                if self.attackCollide(mob.getBox()):
                     mob.life -= self.dmg
                     if mob.life <= 0:
                         mob.alive = False
                         room.enemiesToDestroy.append(mob)
+
+            # player - item collision
+            itemsGenerated = mobsItemsDico[room]['itemsGen']
+            for item in itemsGenerated:
+                if self.collide(item.getBox()):
+                    item.activate()
+                    item.listForDestruction = room.itemsToDestroy
 
     def render(self):
         if self.shouldRender:
@@ -58,7 +68,7 @@ class Attack:
 
 class Player(sprites.GameSprite):
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict, mark: mark, sounds):
+                 spriteBank: dict, mark: mark, sounds, game):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
         self.screen = screen
         self.isInvinsible = False
@@ -94,6 +104,12 @@ class Player(sprites.GameSprite):
         self.updateHandleAttack()
         self.oldPos = (0, 0)
         self.sounds = sounds
+        self.isRenderingText = False
+        self.game = game
+
+    def setRenderingTextMod(self, bool):
+        self.isInvinsible = bool
+        self.isRenderingText = bool
 
     def getAttackBox(self):
         if not self.isAttacking:
@@ -101,30 +117,33 @@ class Player(sprites.GameSprite):
         return self.attackArcCircle.getBox()
 
     def render(self):
-        # image
-        self.screen.blit(self.image, (self.rect.x, self.rect.y))
-        # life
-        w = self.life * config.TILESIZE >> 1
-        h = config.TILESIZE >> 1
-        pygame.draw.rect(self.screen, (30, 230, 30), pygame.Rect(10, 10, w, h))
-        # attack
-        if self.attackArcCircle.shouldRender:
-            self.attackArcCircle.render()
+        if not self.isRenderingText:
+            # image
+            self.screen.blit(self.image, (self.rect.x, self.rect.y))
+            # life
+            w = self.life * config.TILESIZE >> 1
+            h = config.TILESIZE >> 1
+            pygame.draw.rect(self.screen, (30, 230, 30), pygame.Rect(10, 10, w, h))
+            # attack
+            if self.attackArcCircle.shouldRender:
+                self.attackArcCircle.render()
 
-    def update(self, mobsDico):
+    def update(self, mobsItemsDico):
+        if self.isRenderingText:
+            return
         # self.handleInput()
-        self.handleAttack(mobsDico)
+        self.handleAttack(mobsItemsDico)
 
         self.rect.x = int(self.x - self.mark.getX())
         self.rect.y = int(self.y - self.mark.getY())
 
-    def handleAttack(self, mobsDico):
+    def handleAttack(self, mobsItemsDico):
         # attack arc circle
         self.updateCdAttackTickCounter()
         if self.isAttacking:
             # self.sounds.playHitSound2()
             self.updateHandleAttack()
-            self.attackArcCircle.update(mobsDico)
+            self.attackArcCircle.update(mobsItemsDico)
 
     def updateHandleAttack(self):
         start = self.attackArcCircle.start
