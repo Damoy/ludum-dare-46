@@ -7,6 +7,7 @@ from board import Board
 from mark import Mark
 import sprites
 import config
+import threading
 
 
 class Game:
@@ -35,6 +36,7 @@ class Game:
                 break
             self.render()
         pygame.quit()
+
 
     def update(self):
         self.map.update()

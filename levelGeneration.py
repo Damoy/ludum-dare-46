@@ -21,7 +21,7 @@ class GameRoom:
         self.fixedTiles = []
         # Wall
         self.physics = [[0 for x in range(size)] for y in range(size)]
-        self.fixedWall = []
+        self.fixedWalls = []
         self.generatedTiles = []
 
         self.tiles = []
@@ -144,7 +144,6 @@ class TreeRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
         for x in range(self.nbWallToGenerate):
@@ -209,7 +208,7 @@ class RuinedWildRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))
+        # print(len(self.enemies))
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
         for x in range(self.nbWallToGenerate):
@@ -274,7 +273,7 @@ class CossWallRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))
+        # print(len(self.enemies))
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
         for x in range(int(self.size/2) - 1):
@@ -372,7 +371,6 @@ class CorridorWallRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
-        print(len(self.enemies))
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
 

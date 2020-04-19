@@ -8,6 +8,28 @@ import gameTime
 import mark
 import math
 
+class Attack:
+    def __init__(self, x, y, w, h, color, screen, start, stop):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.color = color
+        self.screen = screen
+        self.start = start
+        self.stop = stop
+        self.shouldRender = False
+
+    # collision todo
+    def update(self):
+        pass
+
+    def render(self):
+        if self.shouldRender:
+            pygame.draw.arc(self.screen, self.color,
+                [self.x, self.y, self.w, self.h], self.start, self.stop)
+            self.shouldRender = False
+
 class Player(sprites.GameSprite):
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
                  spriteBank: dict, mark: mark):
@@ -35,11 +57,24 @@ class Player(sprites.GameSprite):
         self.isAttacking = False
         self.canAttack = True
         self.cdAttackTickCounter = gameTime.TickCounter(config.FPS >> 2, False)
+        self.attackArcCircle = Attack(0, 0, config.TILESIZE, config.TILESIZE, (255, 255, 255),
+                                      self.screen, 0, 0)
 
     def render(self):
         w = self.life * config.TILESIZE >> 1
         h = config.TILESIZE >> 1
         pygame.draw.rect(self.screen, (30, 230, 30), pygame.Rect(10, 10, w, h))
+        if self.attackArcCircle.shouldRender:
+            self.attackArcCircle.render()
+
+    def update(self):
+        self.handleInput()
+        self.handleAttack()
+
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+    def handleAttack(self):
         # attack arc circle
         if self.isAttacking:
             start = 0
@@ -61,28 +96,24 @@ class Player(sprites.GameSprite):
                 elif xdir == Direction.RIGHT and ydir == Direction.DOWN:
                     start = 3 * (math.pi / 2)
                     stop = 2 * math.pi
-                x = self.rect.x - 5 if xdir == Direction.LEFT else self.rect.x + 3
-                y = self.rect.y - 5 if ydir == Direction.UP else self.rect.y + 3
+                x = self.rect.x - 8 if xdir == Direction.LEFT else self.rect.x + 6
+                y = self.rect.y - 8 if ydir == Direction.UP else self.rect.y + 6
             elif xdir is not Direction.NONE and ydir is Direction.NONE:
                 start = 3 * math.pi / 4 if xdir == Direction.LEFT else -math.pi / 4
                 stop = -3 * math.pi / 4 if xdir == Direction.LEFT else math.pi / 4
-                x = self.rect.x - 5 if xdir == Direction.LEFT else self.rect.x + 3
+                x = self.rect.x - 8 if xdir == Direction.LEFT else self.rect.x + 6
                 y = self.rect.y
             elif xdir is Direction.NONE and ydir is not Direction.NONE:
                 start = math.pi / 4 if ydir == Direction.UP else 5 * math.pi / 4
                 stop = 3 * math.pi / 4 if ydir == Direction.UP else 7 * math.pi / 4
                 x = self.rect.x - 1
-                y = self.rect.y - 5 if ydir == Direction.UP else self.rect.y + 3
-            pygame.draw.arc(self.screen, (255, 255, 255),
-                [x, y, config.TILESIZE, config.TILESIZE], start, stop)
+                y = self.rect.y - 8 if ydir == Direction.UP else self.rect.y + 6
+            self.attackArcCircle.x = x
+            self.attackArcCircle.y = y
+            self.attackArcCircle.start = start
+            self.attackArcCircle.stop = stop
+            self.attackArcCircle.shouldRender = True
             self.isAttacking = False
-
-    def update(self):
-
-        self.handleInput()
-
-        self.rect.x = self.x - self.mark.getX()
-        self.rect.y = self.y - self.mark.getY()
 
     def handleInput(self):
         for event in pygame.event.get():
