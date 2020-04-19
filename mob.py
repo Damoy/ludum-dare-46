@@ -24,7 +24,7 @@ class Mob(sprites.GameSprite):
         self.spriteBank = spriteBank
         self.directions = {"x": Direction.NONE, "y": Direction.NONE}
         self.animation = self.loadAnimation()
-        self.updateDirectionTickCounter = TickCounter(config.FPS >> 1, False)
+        self.updateDirectionTickCounter = TickCounter(config.FPS >> 2, False)
         self.updateDirectionTickCounter.start()
         self.pxMoveCount = 0
         self.alive = True
@@ -62,7 +62,7 @@ class Mob(sprites.GameSprite):
         ended = self.updateDirectionTickCounter.hasReachedEnd()
 
         if started and ended:
-            if random.randint(0, 3) == 0:
+            if random.randint(0, 4) == 0:
                 # update direction on X
                 randX = random.randint(0, 1)
                 self.directions["x"] = Direction.LEFT if randX == 0 else Direction.RIGHT
@@ -70,7 +70,7 @@ class Mob(sprites.GameSprite):
             else:
                 self.directions["x"] = Direction.NONE
                 self.pxMoveCount = 0
-            if random.randint(0, 3) == 0:
+            if random.randint(0, 4) == 0:
                 # update direction on Y
                 randY = random.randint(0, 1)
                 self.directions["y"] = Direction.UP if randY == 0 else Direction.DOWN
@@ -164,6 +164,23 @@ class Knight1(Mob):
         for leftFrame in knightBank['left']:
             anim.addFrame(Direction.LEFT, leftFrame)
         for rightFrame in knightBank['right']:
+            anim.addFrame(Direction.RIGHT, rightFrame)
+        anim.setDirection(random.choice([Direction.LEFT, Direction.RIGHT]))
+        return anim
+
+class Skeleton(Mob):
+    def __init__(self, x, y, group: sprites.GameSpriteGroup,
+                 spriteBank: dict, mark: Mark, textures: pygame.image):
+        Mob.__init__(self, x, y, group, spriteBank, mark, textures,
+                     spriteBank['dungeon']['mobs']['skeleton']['right'][0],
+                     2, 1)
+
+    def loadAnimation(self):
+        skeletonBank = self.spriteBank['dungeon']['mobs']['skeleton']
+        anim = sprites.DirectedAnimation(120, True)
+        for leftFrame in skeletonBank['left']:
+            anim.addFrame(Direction.LEFT, leftFrame)
+        for rightFrame in skeletonBank['right']:
             anim.addFrame(Direction.RIGHT, rightFrame)
         anim.setDirection(random.choice([Direction.LEFT, Direction.RIGHT]))
         return anim
