@@ -4,9 +4,9 @@ import pygame
 class Sounds:
     def __init__(self):
         pygame.mixer.init()
-        sounds = self.loadSounds()
-        hitSound = None
-        hitSound2 = None
+        self.hitSound = None
+        self.hitSound2 = None
+        self.sounds = self.loadSounds()
 
     def loadSounds(self):
         self.hitSound = pygame.mixer.Sound(os.path.join('res', 'sounds', 'hit.wav'))

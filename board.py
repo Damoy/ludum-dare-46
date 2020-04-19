@@ -22,6 +22,8 @@ class Board:
         self.spriteBank = spriteBank
         self.tilesGroup = sprites.GameSpriteGroup()
         self.boardGrid = []
+        self.texts = texts
+        self.player = player
 
 
     def initBoard(self, width, height,size):
@@ -56,7 +58,7 @@ class Board:
             for x in range(1, height - 1 ):
                 room = self.generateRoom(y, x, size)
                 self.boardGrid[y][x] = room
-        print(self.boardGrid)
+
 
     def generateRoom(self, line, column, size):
         #TODO stuff
