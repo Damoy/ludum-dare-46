@@ -59,7 +59,7 @@ class Board:
         w2 = 0
         h2 = 0
         print("w2:", w2, ";h2:", h2)
-        self.boardGrid[h2][w2] = CastleCenterRoom(self.textures, size, w2, h2, self.texts, self.player)
+        self.boardGrid[h2][w2] = CastleEntrance(self.textures, size, w2, h2, self.texts, self.player)
         self.boardGrid[h2][w2].generateLevel(self.spriteBank, self.mark)
         print(self.boardGrid[h2][w2])
 

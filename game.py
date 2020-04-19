@@ -154,6 +154,7 @@ class Game:
             self.mark.y += offset
         self.mark.y = int(self.mark.y)
         self.mark.x = int(self.mark.x)
+
     def render(self):
         self.screen.fill((255, 255, 255))
         self.board.render()

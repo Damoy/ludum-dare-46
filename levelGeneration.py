@@ -764,8 +764,9 @@ class TopBorder(GameRoom):
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
         self.generatedWall.extend(self.fixedWalls)
-        print(self.generatedWall[1].rect.y)
-        print(self.generatedWall[2].rect.y)
+        self.generatedWall.extend(self.fixedWalls)
+
+
 
 
 class BotBorder(GameRoom):
@@ -1282,10 +1283,6 @@ class SpawnTopLeftBorder(TopLeftBorder):
         self.generatedWall.extend(self.fixedWalls[:-1])
 
 
-
-
-
-# TODO
 class CastleCenterRoom(GameRoom):
 
     def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
@@ -1392,3 +1389,194 @@ class CastleCenterRoom(GameRoom):
         #                 self.generatedWall.append(tile)
         #                 self.tiles.append(tile)
         # self.generatedWall.extend(self.fixedWalls)
+
+
+class CastleEntrance(GameRoom):
+
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
+        self.tilesToGenerate.append(tiles.FloorTiles)
+        self.wallsToGenerate.append((1, 1, tiles.WallTiles))
+        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM]
+
+        self.nbWallToGenerate = 0;
+        self.buildMobs()
+
+    def buildMobs(self):
+        self.enemiesToGenerate[mob.Gobelin] = 1
+
+    def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
+        print(loadedRessources["dungeon"])
+        for y in range(self.size // 2 - 2):
+            for val in range(3):
+                self.fixedWalls.append(
+                    tiles.WallTilesUp(loadedRessources, self.tilesGroup, self.xStart + (0 + y) * config.TILESIZE,
+                                    self.yStart + val * config.TILESIZE, mark, val))
+                self.fixedWalls.append(
+                    tiles.WallTilesUp(loadedRessources, self.tilesGroup, self.xStart + (self.size - 1 - y) * config.TILESIZE,
+                                      self.yStart + val * config.TILESIZE, mark, val))
+                if val <= 1:
+                    #BOT
+                    self.fixedWalls.append(
+                        tiles.WallTilesdown(loadedRessources, self.tilesGroup, self.xStart + (0 + y) * config.TILESIZE,
+                                          self.yStart + (self.size - val - 1) * config.TILESIZE, mark, 0))
+
+                    self.fixedWalls.append(
+                        tiles.WallTilesdown(loadedRessources, self.tilesGroup,
+                                          self.xStart + (self.size - 1 - y) * config.TILESIZE,
+                                          self.yStart + (self.size - val - 1) * config.TILESIZE, mark, 0))
+
+                    #LEFT
+                    self.fixedWalls.append(
+                        tiles.WallTilesLeft(loadedRessources, self.tilesGroup,
+                                          self.xStart + min(val, 1)* config.TILESIZE - 3,
+                                          self.yStart + y * config.TILESIZE, mark, 1))
+
+                    self.fixedWalls.append(
+                        tiles.WallTilesLeft(loadedRessources, self.tilesGroup,
+                                            self.xStart + min(val, 1) * config.TILESIZE - 3,
+                                            self.yStart + (self.size - 1 - y) * config.TILESIZE, mark, 1))
+
+                    # RIGHT
+                    self.fixedWalls.append(
+                        tiles.WallTilesRight(loadedRessources, self.tilesGroup,
+                                            self.xStart + (self.size - 1 - val) * config.TILESIZE + 3,
+                                            self.yStart + y * config.TILESIZE, mark, 1))
+
+                    self.fixedWalls.append(
+                        tiles.WallTilesRight(loadedRessources, self.tilesGroup,
+                                            self.xStart + (self.size - 1 - val) * config.TILESIZE - 3,
+                                            self.yStart + (self.size - 1 - y) * config.TILESIZE, mark, 1))
+                    self.fixedWalls.append(tiles.SqueletonTile(loadedRessources, self.tilesGroup,
+                                   self.xStart + 2 * config.TILESIZE - 1,
+                                   self.yStart + 10 * config.TILESIZE + 1,
+                                   mark))
+                    self.fixedWalls.append(tiles.SqueletonTile(loadedRessources, self.tilesGroup,
+                               self.xStart + 2 * config.TILESIZE - 1,
+                               self.yStart + 5 * config.TILESIZE + 1,
+                               mark))
+
+        for x in range(self.nbWallToGenerate):
+            generated = False
+            tryb = 0
+            brutcap = 100
+            while not generated and tryb < brutcap:
+                tryb += 1
+                wallToGenerate = self.wallsToGenerate[randint(0, len(self.wallsToGenerate) - 1)]
+                generateCoordX = randint(2, len(self.physics) - 4)
+                generateCoordY = randint(2, len(self.physics) - 4)
+
+                # Check generation validity
+                if self.physics[generateCoordY][generateCoordX] == 0:
+                    ycheck = wallToGenerate[1];
+                    xcheck = wallToGenerate[0];
+                    res = True
+                    while ycheck >= 0:
+                        for x in range(xcheck):
+                            if self.physics[generateCoordY - ycheck][generateCoordX - x] == 1:
+                                res = False;
+                                break;
+                        ycheck -= 1;
+                    if res:
+                        ycheck = wallToGenerate[1];
+                        generated = True
+                        while ycheck >= 0:
+                            for x in range(xcheck):
+                                self.physics[generateCoordY - ycheck][generateCoordX - x] = 1
+                            ycheck -= 1
+                        tile = wallToGenerate[2](loadedRessources, self.tilesGroup,
+                                                 self.xStart + generateCoordX * config.TILESIZE,
+                                                 self.yStart + generateCoordY * config.TILESIZE, mark)
+                        self.generatedWall.append(tile)
+                        self.tiles.append(tile)
+        self.generatedWall.extend(self.fixedWalls)
+
+    def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
+        GameRoom.generateTiles(self, loadedRessources, mark)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 3 * config.TILESIZE,
+                               self.yStart + 3 * config.TILESIZE + 2,
+                               mark)
+
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 3 * config.TILESIZE + 3,
+                               self.yStart + 3 * config.TILESIZE + 4,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 3 * config.TILESIZE + 5,
+                               self.yStart + 3 * config.TILESIZE + 1,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+
+
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 5 * config.TILESIZE,
+                               self.yStart + 5 * config.TILESIZE + 2,
+                               mark)
+
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 5 * config.TILESIZE + 3,
+                               self.yStart + 5 * config.TILESIZE + 4,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 5 * config.TILESIZE + 5,
+                               self.yStart + 5 * config.TILESIZE + 1,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+
+
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 3 * config.TILESIZE,
+                               self.yStart + 4 * config.TILESIZE + 2,
+                               mark)
+
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 3 * config.TILESIZE + 3,
+                               self.yStart + 4 * config.TILESIZE + 4,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 3 * config.TILESIZE + 5,
+                               self.yStart + 4 * config.TILESIZE + 1,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+
+
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 4 * config.TILESIZE,
+                               self.yStart + 5 * config.TILESIZE + 2,
+                               mark)
+
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 4 * config.TILESIZE + 3,
+                               self.yStart + 5 * config.TILESIZE + 4,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+        tile = tiles.CoinTiles(loadedRessources, self.tilesGroup,
+                               self.xStart + 4 * config.TILESIZE + 5,
+                               self.yStart + 5 * config.TILESIZE + 1,
+                               mark)
+        self.fixedTiles.append(tile)
+        self.tiles.append(tile)
+
+
+
+
+
