@@ -12,6 +12,7 @@ class Adjacency(Enum):
     BOTTOM = 1
     LEFT = 2
     RIGHT = 3
+    ALL = 4
 
 
 class GameRoom:
@@ -46,7 +47,7 @@ class GameRoom:
         self.enemiesToDestroy = []
         self.items = []
 
-        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM, Adjacency.LEFT, Adjacency.RIGHT]
+        self.adjacencies = [Adjacency.ALL]
 
         self.xStart = config.TILESIZE * size * column
         self.yStart = config.TILESIZE * size * line
@@ -256,7 +257,7 @@ class CossWallRoom(GameRoom):
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
-
+        self.adjacencies = [Adjacency.RIGHT, Adjacency.LEFT, Adjacency.BOTTOM, Adjacency.TOP]
 
         self.nbWallToGenerate = 1;
         self.buildMobs()
@@ -459,7 +460,7 @@ class VCorridorWallRoom(GameRoom):
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
-        self.adjacencies = [Adjacency.RIGHT, Adjacency.LEFT]
+        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM]
 
         self.nbWallToGenerate = 1;
         self.buildMobs()

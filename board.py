@@ -36,49 +36,140 @@ class Board:
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [HCorridorWallRoom, BasicRoom,CossWallRoom, VCorridorWallRoom];
+        rooms = [BasicRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom];
         newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
-        possibleTop = (Adjacency.TOP in newRoom.adjacencies and
-                       ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies )
-                       or not (Adjacency.TOP in newRoom.adjacencies))
+        possibleTop = Adjacency.ALL in newRoom.adjacencies or (Adjacency.TOP in newRoom.adjacencies and
+                                                               (not (line == 0) and (
+                                                                           self.boardGrid[line - 1][column] is None or
+                                                                           Adjacency.ALL in self.boardGrid[line - 1][
+                                                                               column].adjacencies or Adjacency.BOTTOM in
+                                                                           self.boardGrid[line - 1][
+                                                                               column].adjacencies))
+                                                               or not (Adjacency.TOP in newRoom.adjacencies) and (
+                                                                           (not (line == len(self.boardGrid) - 1))
+                                                                           and ((self.boardGrid[line + 1][
+                                                                                     column] is None or not Adjacency.BOTTOM in
+                                                                                                            self.boardGrid[
+                                                                                                                line + 1][
+                                                                                                                column].adjacencies))))
 
-        possibleBottom = (Adjacency.BOTTOM in newRoom.adjacencies and
-                          ((line == len(self.boardGrid) - 1) or self.boardGrid[line + 1][column] is None or Adjacency.TOP in self.boardGrid[line + 1][column].adjacencies  )
-                          or not (Adjacency.BOTTOM in newRoom.adjacencies))
+        possibleBottom = Adjacency.ALL in newRoom.adjacencies or (Adjacency.BOTTOM in newRoom.adjacencies and
+                                                                  (not (line == len(self.boardGrid) - 1) and (
+                                                                          self.boardGrid[line + 1][
+                                                                              column] is None
+                                                                          or Adjacency.ALL in
+                                                                          self.boardGrid[line + 1][
+                                                                              column].adjacencies or Adjacency.TOP in
+                                                                          self.boardGrid[line + 1][
+                                                                              column].adjacencies))
+                                                                  or not (Adjacency.BOTTOM in newRoom.adjacencies) and (
+                                                                              (not (line == 0))
+                                                                              and (
+                                                                              (self.boardGrid[line - 1][column] is None
+                                                                               or Adjacency.ALL in
+                                                                               self.boardGrid[line - 1][
+                                                                                   column].adjacencies))))
 
-        possibleLEFT = (Adjacency.LEFT in newRoom.adjacencies and
-                        ((column == 0) or self.boardGrid[line][column - 1] is None or Adjacency.RIGHT in self.boardGrid[line][column - 1].adjacencies  )
-                        or not (Adjacency.LEFT in newRoom.adjacencies))
+        possibleLEFT = Adjacency.ALL in newRoom.adjacencies or (Adjacency.LEFT in newRoom.adjacencies and
+                                                                (not (column == 0) and (
+                                                                        self.boardGrid[line][column - 1] is None
+                                                                        or Adjacency.ALL in
+                                                                        self.boardGrid[line][
+                                                                            column - 1].adjacencies or Adjacency.RIGHT in
+                                                                        self.boardGrid[line][
+                                                                            column - 1].adjacencies))
+                                                                or not (Adjacency.LEFT in newRoom.adjacencies) and (
+                                                                            not (column == len(self.boardGrid[0]) - 1)
+                                                                            and ((self.boardGrid[line][
+                                                                                      column + 1] is None or not Adjacency.RIGHT in
+                                                                                                                             self.boardGrid[
+                                                                                                                                 line][
+                                                                                                                                 column + 1].adjacencies or Adjacency.ALL in
+                                                                                  self.boardGrid[line][
+                                                                                      column + 1].adjacencies
+                                                                                  ))))
 
-        possibleRight = (Adjacency.RIGHT in newRoom.adjacencies and
-                         ((column == len(self.boardGrid[0]) - 1) or self.boardGrid[line][column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies )
-                         or not (Adjacency.RIGHT in newRoom.adjacencies))
+        possibleRight = Adjacency.ALL in newRoom.adjacencies or (Adjacency.RIGHT in newRoom.adjacencies and
+                                                                 (not (column == len(self.boardGrid[0]) - 1) and (
+                                                                         self.boardGrid[line][
+                                                                             column + 1] is None or
+                                                                         Adjacency.ALL in self.boardGrid[line][
+                                                                             column + 1].adjacencies or Adjacency.LEFT in
+                                                                         self.boardGrid[line][
+                                                                             column + 1].adjacencies))
+                                                                 or not (Adjacency.RIGHT in newRoom.adjacencies)
+                                                                 and ((column == 0)
+                                                                      and ((
+                                    self.boardGrid[line][column - 1] is None or not Adjacency.RIGHT in
+                                                                                    self.boardGrid[line][
+                                                                                        column - 1].adjacencies
+                                    or Adjacency.ALL in self.boardGrid[line][column - 1].adjacencies))))
 
+
+        if(column == 7 and line == 7):
+            #
+            print("haut :" + str(self.boardGrid[3][4]))
+            print("g :" + str(self.boardGrid[4][3]))
+            print("b: " + str(self.boardGrid[5][4]))
+            print("d : " + str(self.boardGrid[4][5]))
+            print(newRoom)
+            print(possibleLEFT)
+            print(possibleRight)
+            print(possibleBottom)
+            print(possibleTop)
+            #print(self.boardGrid[line][column].adjacencies)
+            #print(self.boardGrid[line - 1][column].adjacencies)
 
         while not (possibleTop and possibleBottom and possibleLEFT and possibleRight):
 
             newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
-            possibleTop = (Adjacency.TOP in newRoom.adjacencies and
-                           ((line == 0) or self.boardGrid[line - 1][column] is None or Adjacency.BOTTOM in
-                            self.boardGrid[line - 1][column].adjacencies)
-                           or not (Adjacency.TOP in newRoom.adjacencies))
+            possibleTop = Adjacency.ALL in newRoom.adjacencies or (Adjacency.TOP in newRoom.adjacencies and
+                       (not (line == 0) and (self.boardGrid[line - 1][column] is None or
+                        Adjacency.ALL in self.boardGrid[line - 1][column].adjacencies or Adjacency.BOTTOM in self.boardGrid[line - 1][column].adjacencies))
+                       or not (Adjacency.TOP in newRoom.adjacencies) and ((not (line == len(self.boardGrid) - 1))
+                                                                      and ( (self.boardGrid[line + 1][column] is None or not Adjacency.BOTTOM in self.boardGrid[line + 1][column].adjacencies))))
 
-            possibleBottom = (Adjacency.BOTTOM in newRoom.adjacencies and
-                              ((line == len(self.boardGrid) - 1) or self.boardGrid[line + 1][
-                                  column] is None or Adjacency.TOP in self.boardGrid[line + 1][column].adjacencies)
-                              or not (Adjacency.BOTTOM in newRoom.adjacencies))
+            possibleBottom = Adjacency.ALL in newRoom.adjacencies or (Adjacency.BOTTOM in newRoom.adjacencies and
+                                                                      (not (line == len(self.boardGrid) - 1) and (
+                                                                                  self.boardGrid[line + 1][
+                                                                                      column] is None
+                                                                                  or Adjacency.ALL in
+                                                                                  self.boardGrid[line + 1][
+                                                                                      column].adjacencies or Adjacency.TOP in
+                                                                                  self.boardGrid[line + 1][
+                                                                                      column].adjacencies))
+                                                                      or not (Adjacency.BOTTOM in newRoom.adjacencies) and ((not (line == 0))
+                                                                      and ((self.boardGrid[line - 1][column] is None
+                                                                                or Adjacency.ALL in self.boardGrid[line - 1][column].adjacencies))))
 
-            possibleLEFT = (Adjacency.LEFT in newRoom.adjacencies and
-                            ((column == 0) or self.boardGrid[line][column - 1] is None or Adjacency.RIGHT in
-                             self.boardGrid[line][column - 1].adjacencies)
-                            or not (Adjacency.LEFT in newRoom.adjacencies))
+            possibleLEFT = Adjacency.ALL in newRoom.adjacencies or (Adjacency.LEFT in newRoom.adjacencies and
+                                                                    (not (column == 0) and (
+                                                                                self.boardGrid[line][column - 1] is None
+                                                                                or Adjacency.ALL in
+                                                                                self.boardGrid[line][
+                                                                                    column - 1].adjacencies or Adjacency.RIGHT in
+                                                                                self.boardGrid[line][
+                                                                                    column - 1].adjacencies))
+                                                                    or not (Adjacency.LEFT in newRoom.adjacencies) and (not (column == len(self.boardGrid[0]) - 1)
+                                                                      and ( (self.boardGrid[line][column + 1] is None or not Adjacency.RIGHT in  self.boardGrid[line][
+                                                                                    column + 1].adjacencies or Adjacency.ALL in  self.boardGrid[line][
+                                                                                    column + 1].adjacencies
+                                                                                ))))
 
-            possibleRight = (Adjacency.RIGHT in newRoom.adjacencies and
-                             ((column == len(self.boardGrid[0]) - 1) or self.boardGrid[line][
-                                 column + 1] is None or Adjacency.LEFT in self.boardGrid[line][column + 1].adjacencies)
-                             or not (Adjacency.RIGHT in newRoom.adjacencies))
+            possibleRight = Adjacency.ALL in newRoom.adjacencies or (Adjacency.RIGHT in newRoom.adjacencies and
+                                                                     (not (column == len(self.boardGrid[0]) - 1) and (
+                                                                                 self.boardGrid[line][
+                                                                                     column + 1] is None or
+                                                                                 Adjacency.ALL in self.boardGrid[line][
+                                                                                     column + 1].adjacencies or Adjacency.LEFT in
+                                                                                 self.boardGrid[line][
+                                                                                     column + 1].adjacencies))
+                                                                     or not (Adjacency.RIGHT in newRoom.adjacencies)
+                                                                     and ((column == 0)
+                                                                      and ( (self.boardGrid[line][column - 1] is None or not Adjacency.RIGHT in  self.boardGrid[line][column - 1].adjacencies
+                                                                               or Adjacency.ALL in  self.boardGrid[line][column - 1].adjacencies))))
 
         newRoom.generateLevel(self.spriteBank, self.mark)
         return newRoom;
@@ -97,8 +188,8 @@ class Board:
         surface = self.window.get()
         for line in self.boardGrid:
             for col in line:
-                if config.CANVASWIDTH + config.CANVASWIDTH /2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH / 2 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT/2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT/2:
+                if config.CANVASWIDTH + config.CANVASWIDTH / 2 > col.xStart - self.mark.x > - config.CANVASWIDTH - config.CANVASWIDTH / 2 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 2 > col.yStart - self.mark.y > - config.CANVASHEIGHT - config.CANVASHEIGHT / 2:
                     col.render(surface)
                     pass
 
