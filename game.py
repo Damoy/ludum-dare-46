@@ -46,10 +46,8 @@ class Game:
         else:
             self.player.y += -self.player.dy
             self.player.x += -self.player.dx
-
-
-        keys = pygame.key.get_pressed()
-        events = pygame.event.get()
+            keys = pygame.key.get_pressed()
+            events = pygame.event.get()
 
         self.allSprites.update()
 
@@ -63,10 +61,10 @@ class Game:
                 if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
                         config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
                     for wall in col.generatedWall:
-                        print(pygame.sprite.groupcollide(self.allSprites, col.enemies, False,False))
-                        for mob in pygame.sprite.groupcollide(self, col.enemies, False,False):
-                            mob.x += -mob.dx
-                            mob.y += -mob.dy
+                        # print(pygame.sprite.groupcollide(self.allSprites, col.enemies, False,False))
+                        # for mob in pygame.sprite.groupcollide(self, col.enemies, False,False):
+                        #     mob.x += -mob.dx
+                        #     mob.y += -mob.dy
                         if pygame.sprite.collide_rect(player, wall):
                             return True
 

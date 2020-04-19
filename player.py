@@ -59,6 +59,8 @@ class Player(sprites.GameSprite):
         self.isAttacking = False
         self.canAttack = True
         self.cdAttackTickCounter = gameTime.TickCounter(config.FPS >> 2, False)
+        self.attackArcCircle = Attack(0, 0, config.TILESIZE, config.TILESIZE,
+                                      (255, 255, 255), self.screen, 0, 0)
         self.oldPos = (0, 0)
 
     def render(self):
@@ -69,7 +71,7 @@ class Player(sprites.GameSprite):
             self.attackArcCircle.render()
 
     def update(self):
-        self.handleInput()
+        # self.handleInput()
         self.handleAttack()
 
         self.rect.x = self.x - self.mark.getX()
