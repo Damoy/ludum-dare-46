@@ -36,7 +36,7 @@ class Board:
     def generateRoom(self, line, column, size):
         #TODO stuff
         #like LevelMAnager.getArray
-        rooms = [CorridorWallRoom,CossWallRoom,CorridorWallRoom];
+        rooms = [HCorridorWallRoom, BasicRoom,BasicRoom,BasicRoom,BasicRoom,BasicRoom,CossWallRoom, VCorridorWallRoom];
         newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
 
         possibleTop = (Adjacency.TOP in newRoom.adjacencies and
@@ -92,10 +92,11 @@ class Board:
                     col.update()
 
     def render(self):
+        window = self.window.get()
         for line in self.boardGrid:
             for col in line:
                 if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
                         config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
-                    col.render(self.window.get())
+                    col.render(window)
 
 

@@ -7,6 +7,7 @@ from random import randint
 class Tile(sprites.GameSprite):
     def __init__(self, image: pygame.image, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
         sprites.GameSprite.__init__(self, image, group, x, y)
+
         self.mark = mark
         self.x = x;
         self.y = y;
