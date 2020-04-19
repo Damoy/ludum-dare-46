@@ -19,6 +19,8 @@ class Player(sprites.GameSprite):
         self.x = x
         self.y = y
         self.dv = 1
+        self.dx = 0;
+        self.dy = 0;
         self.dvDash = self.dv * 3
         self.pxMoveCount = 0
         self.directions = {"x": Direction.LEFT, "y": Direction.DOWN}
@@ -35,6 +37,7 @@ class Player(sprites.GameSprite):
         self.isAttacking = False
         self.canAttack = True
         self.cdAttackTickCounter = gameTime.TickCounter(config.FPS >> 2, False)
+        self.oldPos = (0, 0)
 
     def render(self):
         w = self.life * config.TILESIZE >> 1
@@ -78,9 +81,6 @@ class Player(sprites.GameSprite):
             self.isAttacking = False
 
     def update(self):
-
-        self.handleInput()
-
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 
@@ -123,35 +123,36 @@ class Player(sprites.GameSprite):
 
 
     def move(self):
+        self.oldPos = ( self.x, self.y)
         self.updateCdDashTickCounter()
 
         if self.isDashing:
             self.updateDash()
         else:
-            dx = 0
-            dy = 0
+            self.dx = 0
+            self.dy = 0
             dirX = Direction.NONE
             dirY = Direction.NONE
 
             keys = pygame.key.get_pressed()
             if keys[pygame.K_LEFT]:
-                dx = -self.dv
+                self.dx = -self.dv
                 dirX = Direction.LEFT
             if keys[pygame.K_RIGHT]:
-                dx = self.dv
+                self.dx = self.dv
                 dirX = Direction.RIGHT
             if keys[pygame.K_DOWN]:
-                dy = self.dv
+                self.dy = self.dv
                 dirY = Direction.DOWN
             if keys[pygame.K_UP]:
-                dy = -self.dv
+                self.dy = -self.dv
                 dirY = Direction.UP
 
             dirUpdated = self.directions["x"] is not dirX or self.directions["y"] is not dirY
             self.directions["x"] = dirX
             self.directions["y"] = dirY
 
-            if keys[pygame.K_f] and (dx != 0 or dy != 0) and self.canDash:
+            if keys[pygame.K_f] and (self.dx != 0 or self.dy != 0) and self.canDash:
                 self.isDashing = True
                 self.canDash = False
 
@@ -161,15 +162,16 @@ class Player(sprites.GameSprite):
             else:
                 self.animation = self.walkAnimation
 
-            if not self.isDashing and dx != 0 or dy != 0:
-                self.pxMoveCount += max(abs(dx), abs(dy))
-                self.x += dx
-                self.y += dy
+            if not self.isDashing and self.dx != 0 or self.dy != 0:
+                self.pxMoveCount += max(abs(self.dx), abs(self.dy))
+                self.x += self.dx
+                self.y += self.dy
                 if dirUpdated:
                     self.setAnimationDirection()
                 elif self.pxMoveCount >= config.TILESIZE:
                     self.pxMoveCount = 0
                     self.updateAnimation()
+
 
     def setAnimationDirection(self):
         if self.directions["y"] is Direction.NONE:

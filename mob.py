@@ -11,6 +11,8 @@ class Mob(sprites.GameSprite):
                  spriteBank: dict, mark: Mark, textures: pygame.image, startImage: pygame.image):
         sprites.GameSprite.__init__(self, startImage, group)
         self.mark = mark
+        self.dx = 0;
+        self.dy = 0;
         self.rect.x = x
         self.rect.y = y
         self.x = x
@@ -33,6 +35,7 @@ class Mob(sprites.GameSprite):
         self.fixBounds(roomBounds)
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
+
 
     def updateDirection(self):
         self.updateDirectionTickCounter.update()
@@ -63,34 +66,34 @@ class Mob(sprites.GameSprite):
         # oldydir = oldDirs["y"]
         xdir = self.directions["x"]
         ydir = self.directions["y"]
-        dx = 0
-        dy = 0
+        self.dx = 0
+        self.dy = 0
         if xdir is not Direction.NONE:
             if xdir == Direction.LEFT:
-                dx = -self.dv
+                self.dx = -self.dv
             if xdir == Direction.RIGHT:
-                dx = self.dv
+                self.dx = self.dv
         if ydir is not Direction.NONE:
             if ydir == Direction.UP:
-                dy = -self.dv
+                self.dy = -self.dv
             if ydir == Direction.DOWN:
-                dy = self.dv
+                self.dy = self.dv
 
         if xdir != oldxdir:
-            if dx > 0:
+            if self.dx > 0:
                 self.animation.setDirection(Direction.RIGHT)
-            elif dx < 0:
+            elif self.dx < 0:
                 self.animation.setDirection(Direction.LEFT)
             self.image = self.animation.getCurrentFrame()
 
-        self.pxMoveCount += max(abs(dx), abs(dy))
+        self.pxMoveCount += max(abs(self.dx), abs(self.dy))
         if self.pxMoveCount > config.TILESIZE:
             self.pxMoveCount = 0
             self.animation.update()
             self.image = self.animation.getCurrentFrame()
 
-        self.x += dx
-        self.y += dy
+        self.x += self.dx
+        self.y += self.dy
 
     def fixBounds(self, roomBounds):
         xstart = roomBounds[0]

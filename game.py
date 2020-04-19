@@ -20,12 +20,13 @@ class Game:
         self.textures = sprites.load(os.path.join('res', 'graphics', 'textures.png'))
         self.spriteBank = sprites.loadSpriteBank(self.textures)
         self.mark = Mark(0, 0)
-        self.map = Board(self.window, self.textures, self.spriteBank, self.mark)
-        self.map.initBoard(10, 10, 10);
+        self.board = Board(self.window, self.textures, self.spriteBank, self.mark)
+        self.board.initBoard(10, 10, 10);
         self.allSprites = sprites.GameSpriteGroup()
-        self.player = Player(self.window.get(), self.textures, 150, 150, self.allSprites, self.spriteBank, self.mark)
+        self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites, self.spriteBank, self.mark)
 
     def gameLoop(self):
+
         self.isRunning = True
         while self.isRunning:
             self.clock.tick(config.FPS)
@@ -37,36 +38,83 @@ class Game:
         pygame.quit()
 
     def update(self):
-        self.map.update()
+        self.board.update()
+        if not self.checkCollide(self.player):
+            self.player.handleInput()
+        else:
+            self.player.y += -self.player.dy
+            self.player.x += -self.player.dx
+
+
+        keys = pygame.key.get_pressed()
+        events = pygame.event.get()
+
         self.allSprites.update()
+
         self.updateMark()
         if self.player.userEnded:
             self.isRunning = False
 
+    def checkCollide(self, player):
+        for line in self.board.boardGrid:
+            for col in line:
+                if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+                    for wall in col.generatedWall:
+                        print(pygame.sprite.groupcollide(self.allSprites, col.enemies, False,False))
+                        for mob in pygame.sprite.groupcollide(self, col.enemies, False,False):
+                            mob.x += -mob.dx
+                            mob.y += -mob.dy
+                        if pygame.sprite.collide_rect(player, wall):
+                            return True
+
+
+
+
+        return False
+
+
     def updateMark(self):
-        if self.player.x - self.mark.getX() > self.player.screen.get_width() * 0.70:
+
+        if self.player.x - self.mark.getX() > self.player.screen.get_width() * 0.70 and not self.player.x > len(self.board.boardGrid[0]) * len(self.board.boardGrid) * config.TILESIZE - config.CANVASWIDTH :
             offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.70
             self.mark.x += offset
 
-        elif self.player.x - self.mark.getX() < self.player.screen.get_width() * 0.2:
-            offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.20
+        elif self.player.x - self.mark.getX() < self.player.screen.get_width() * 0.30 and not self.player.x < config.CANVASWIDTH :
+            offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.30
             self.mark.x += offset
 
-        if self.player.y - self.mark.getY() < self.player.screen.get_height() * 0.1:
-            offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.10
+        if self.player.y - self.mark.getY() < self.player.screen.get_height() * 0.30 and not self.player.y < config.CANVASHEIGHT:
+            offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.30
             self.player.mark.y += offset
 
-        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.8:
-            offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.80
+        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > len(self.board.boardGrid[0]) * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT:
+            offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.70
             self.mark.y += offset
 
     def render(self):
         self.screen.fill((255, 255, 255))
-        self.map.render()
+        self.board.render()
         self.player.render()
         self.allSprites.draw(self.screen)
         self.window.render()
 
+    def compute_penetration(self, block, old_rect, new_rect):
+        """Calcul la distance de pénétration du `new_rect` dans le `block` donné.
+
+        `block`, `old_rect` et `new_rect` sont des pygame.Rect.
+        Retourne les distances `dx_correction` et `dy_correction`.
+        """
+        dx_correction = dy_correction = 0.0
+        if old_rect.bottom <= block.top < new_rect.bottom:
+            dy_correction = block.top - new_rect.bottom
+        elif old_rect.top >= block.bottom > new_rect.top:
+            dy_correction = block.bottom - new_rect.top
+        if old_rect.right <= block.left < new_rect.right:
+            dx_correction = block.left - new_rect.right
+        elif old_rect.left >= block.right > new_rect.left:
+            dx_correction = block.right - new_rect.left
+        return dx_correction, dy_correction
 
 def main():
     game = Game()
