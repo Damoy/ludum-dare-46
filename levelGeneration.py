@@ -102,9 +102,6 @@ class GameRoom:
     def buildItems(self):
         pass
 
-    def generateTiles(self, loadedRessource: dict, mark : mark.Mark):
-        pass
-
 
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
@@ -1016,7 +1013,6 @@ class TopRightBorder(GameRoom):
         self.generatedWall.extend(self.fixedWalls)
 
 
-
 class TopRightBorder(GameRoom):
 
     def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
@@ -1028,12 +1024,12 @@ class TopRightBorder(GameRoom):
         self.buildMobs()
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
-        print("x")
+
         for y in range(self.size):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + (self.size - 1 ) * config.TILESIZE,
                                   self.yStart + y * config.TILESIZE, mark))
-        for x in range(1, self.size):
+        for x in range(self.size - 1):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE,
                                   self.yStart + 0 * config.TILESIZE, mark))
@@ -1091,7 +1087,7 @@ class BottomRightBorder(GameRoom):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + (self.size - 1) * config.TILESIZE,
                                   self.yStart + y * config.TILESIZE, mark))
-        for x in range(1, self.size):
+        for x in range(self.size - 1):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE,
                                   self.yStart + (self.size - 1) * config.TILESIZE, mark))
@@ -1190,3 +1186,21 @@ class BottomLeftBorder(GameRoom):
         self.generatedWall.extend(self.fixedWalls)
         print(self.generatedWall[1].rect.y)
         print(self.generatedWall[2].rect.y)
+
+
+class SpawnTopLeftBorder(TopLeftBorder):
+
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
+        self.tilesToGenerate.append(tiles.GrassTile)
+        self.tilesToGenerate.append(tiles.FlowerGrassTile)
+        self.adjacencies = [Adjacency.LEFT, Adjacency.BOTTOM]
+        self.nbWallToGenerate = 0
+        self.buildMobs()
+
+    def generateTiles(self, loadedRessources: dict, mark: mark.Mark):
+        GameRoom.generateTiles(self, loadedRessources,mark)
+        self.fixedTiles.append(tiles.FloorTiles(loadedRessources, self.tilesGroup, self.xStart + 5 * config.TILESIZE, self.yStart + 5 * config.TILESIZE,
+                                                                   mark))
+
+
