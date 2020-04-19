@@ -75,3 +75,59 @@ class WallTiles(Tile):
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 
+
+class WallTilesUp(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark, id):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['up'][id], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+class WallTilesLeft(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark, id):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['left'][id], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+class WallTilesTopLeftCorner(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['upLeftCorner'], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+class WallTilesDownLeftCorner(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['downLeftCorner'], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+
+class WallTilesDownRightCorner(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['downRightCorner'], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
+
+
+class WallTilesUpRightCorner(Tile):
+    def __init__(self, spriteBank: dict, group: sprites.GameSpriteGroup, x, y, mark: mark.Mark):
+
+        Tile.__init__(self, spriteBank['dungeon']['walls']['upRightCorner'], group, x, y, mark)
+
+    def update(self):
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
