@@ -18,12 +18,19 @@ class Mob(sprites.GameSprite):
         self.x = x
         self.y = y
         self.dv = 1
+        self.damage = 1;
         self.spriteBank = spriteBank
         self.directions = {"x": Direction.NONE, "y": Direction.NONE}
         self.animation = self.loadAnimation()
         self.updateDirectionTickCounter = TickCounter(config.FPS >> 1, False)
         self.updateDirectionTickCounter.start()
         self.pxMoveCount = 0
+
+    def collideWall(self):
+        self.x += -self.dx
+        self.y += -self.dy
+        self.rect.x = self.x - self.mark.getX()
+        self.rect.y = self.y - self.mark.getY()
 
     def loadAnimation(self):
         return None

@@ -144,6 +144,7 @@ class TreeRoom(GameRoom):
                 x = self.getRandomX()
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
+                self.enemiesGenerated.append(m)
                 self.enemies.add(m)
 
 
@@ -179,7 +180,6 @@ class TreeRoom(GameRoom):
                         tile = wallToGenerate[2](loadedRessources, self.tilesGroup, self.xStart + generateCoordX * config.TILESIZE, self.yStart + generateCoordY * config.TILESIZE, mark)
                         self.generatedWall.append(tile)
                         self.tiles.append(tile)
-
 
 
 class RuinedWildRoom(GameRoom):
@@ -368,6 +368,8 @@ class HCorridorWallRoom(GameRoom):
                 self.generatedTiles.append(tile)
                 self.tiles.append(tile)
 
+
+
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
             for nb in range(self.enemiesToGenerate[mobClass]):
@@ -375,6 +377,7 @@ class HCorridorWallRoom(GameRoom):
                 y = self.getRandomY()
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
+                self.enemiesGenerated.append(m)
 
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
