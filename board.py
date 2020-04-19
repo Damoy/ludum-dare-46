@@ -26,26 +26,26 @@ class Board:
         self.texts = texts
         self.player = player
 
+    def initBoard(self, width, height, size):
 
-    def initBoard(self, width, height,size):
         self.boardGrid = [[None for x in range(width)] for y in range(height)]
 
-        self.boardGrid[0][0] = TopLeftBorder(self.textures, size, 0, 0, self.texts, self.player)
+        self.boardGrid[0][0] = SpawnTopLeftBorder(self.textures, size, 0, 0, self.texts, self.player)
         self.boardGrid[0][0].generateLevel(self.spriteBank, self.mark)
 
-        self.boardGrid[0][len(self.boardGrid) - 1] = TopRightBorder(self.textures, size, 0, len(self.boardGrid[0]), self.texts, self.player)
+        self.boardGrid[0][len(self.boardGrid) - 1] = TopRightBorder(self.textures, size, 0, len(self.boardGrid[0]) - 1, self.texts, self.player)
         self.boardGrid[0][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
-        # print(self.boardGrid[0][len(self.boardGrid) - 1])
-        self.boardGrid[len(self.boardGrid[0]) - 1][0] = BottomLeftBorder(self.textures, size, len(self.boardGrid), 0, self.texts, self.player)
+
+        self.boardGrid[len(self.boardGrid[0]) - 1][0] = BottomLeftBorder(self.textures, size, len(self.boardGrid) - 1, 0, self.texts, self.player)
         self.boardGrid[len(self.boardGrid[0]) - 1][0].generateLevel(self.spriteBank, self.mark)
 
-        self.boardGrid[len(self.boardGrid[0])- 1][len(self.boardGrid) - 1] = BottomRightBorder(self.textures, size, len(self.boardGrid), len(self.boardGrid), self.texts, self.player)
+        self.boardGrid[len(self.boardGrid[0])- 1][len(self.boardGrid) - 1] = BottomRightBorder(self.textures, size, len(self.boardGrid) - 1, len(self.boardGrid) - 1, self.texts, self.player)
         self.boardGrid[len(self.boardGrid[0])- 1][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
 
-        for z in range(1, height):
+        for z in range(1, height - 1):
             self.boardGrid[z][0] = LeftBorder(self.textures, size, z, 0, self.texts, self.player)
             self.boardGrid[z][0].generateLevel(self.spriteBank, self.mark)
-            self.boardGrid[z][len(self.boardGrid) - 1] = RightBorder(self.textures, size, z, 0, self.texts, self.player)
+            self.boardGrid[z][len(self.boardGrid) - 1] = RightBorder(self.textures, size, z, len(self.boardGrid) - 1, self.texts, self.player)
             self.boardGrid[z][len(self.boardGrid) - 1].generateLevel(self.spriteBank, self.mark)
 
         for w in range(1, width - 1):
@@ -54,17 +54,11 @@ class Board:
             self.boardGrid[len(self.boardGrid[0]) - 1][w] = BotBorder(self.textures, size,len(self.boardGrid[0]) - 1  , w, self.texts, self.player)
             self.boardGrid[len(self.boardGrid[0]) - 1][w].generateLevel(self.spriteBank, self.mark)
 
-        for y in range(1, height - 1):
-
-            for x in range(1, width - 1 ):
+        for y in range(1, width - 1):
+            for x in range(1, height - 1):
                 room = self.generateRoom(y, x, size)
                 self.boardGrid[y][x] = room
-
-        print(self.boardGrid[0][0])
-        print(self.boardGrid[0][1])
-        print(self.boardGrid[1][0])
-        print(self.boardGrid[1][1])
-
+        print(self.boardGrid[9][0])
 
     def generateRoom(self, line, column, size):
         #TODO stuff
