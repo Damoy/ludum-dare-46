@@ -23,7 +23,7 @@ class Game:
         self.spriteBank = sprites.loadSpriteBank(self.textures)
         self.mark = Mark(0, 0)
         self.board = Board(self.window, self.textures, self.spriteBank, self.mark, self.texts)
-        self.board.initBoard(10, 10, 10);
+        self.board.initBoard(10, 10, 16)
         self.allSprites = sprites.GameSpriteGroup()
         self.sounds = sound.Sounds()
         self.player = Player(self.window.get(), self.textures, 100, 90, self.allSprites,
@@ -127,7 +127,7 @@ class Game:
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.30
             self.player.mark.y += offset
 
-        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > 17 * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT - 64 :
+        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > 17 * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT + 16 :
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.70
             self.mark.y += offset
 

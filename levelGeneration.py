@@ -122,9 +122,9 @@ class BasicRoom(GameRoom):
         self.buildItems()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = 1
-        self.enemiesToGenerate[mob.Knight1] = 1
-        self.enemiesToGenerate[mob.Skeleton] = 1
+        self.enemiesToGenerate[mob.Gobelin] = {'nb': 1, "proba": 0.25}
+        self.enemiesToGenerate[mob.Knight1] = {'nb': 1, "proba": 0.25}
+        self.enemiesToGenerate[mob.Skeleton] = {'nb': 1, "proba": 0.25}
 
     def buildItems(self):
         self.itemsToGenerate[item.Scroll] = {"nb": 1, "proba": 0.20, "content": "ZIZOU"}

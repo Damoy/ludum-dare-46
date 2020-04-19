@@ -40,7 +40,7 @@ class Board:
         #TODO stuff
         #like LevelMAnager.getArray
         rooms = [BasicRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,HCorridorWallRoom,VCorridorWallRoom,VCorridorWallRoom];
-        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column)
+        newRoom = rooms[randint(0, len(rooms) - 1)](self.textures, size, line, column, self.texts)
 
         possibleTop = Adjacency.ALL in newRoom.adjacencies or (((Adjacency.TOP in newRoom.adjacencies and
                                                                 not (line == 0)) and (
