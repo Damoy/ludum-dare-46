@@ -14,7 +14,7 @@ class Game:
     def __init__(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1' # to center window
         pygame.init()
-        self.window = Window("Game", config.HEIGHT, config.WIDTH, 3, flags=0) # [300, 226]
+        self.window = Window("Game", config.HEIGHT, config.WIDTH, config.SCALE, flags=0) # [300, 226]
         self.screen = self.window.get()
         self.clock = pygame.time.Clock()
         self.isRunning = False
@@ -49,6 +49,15 @@ class Game:
             self.player.y += -self.player.dy
             self.player.x += -self.player.dx
 
+        if self.player.x < 0:
+            self.player.x = 0
+        if self.player.y < 0:
+            self.player.y = 0
+
+        if self.player.x + self.player.rect.width > 10 * 16 * 16:
+            self.player.x = 10 * 16 * 16 - 16
+        if self.player.y + self.player.rect.height > 10 * 16 * 16:
+            self.player.y = 10 * 16 * 16 - 16
         self.cleanMobs()
 
         keys = pygame.key.get_pressed()
@@ -69,7 +78,7 @@ class Game:
         for line in self.board.boardGrid:
             for col in line:
                 if config.CANVASWIDTH + config.CANVASWIDTH / 1.5 > col.xStart - self.mark.x > - config.CANVASWIDTH / 1.5 and \
-                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT / 1.5:
+                        config.CANVASHEIGHT + config.CANVASHEIGHT / 1.5 > col.yStart - self.mark.y > - config.CANVASHEIGHT  / 1.5:
                     mobs[col] = {"mobsGen": col.enemiesGenerated} # "mobsDestroy": col.enemiesToDestroy
         return mobs
 
@@ -94,17 +103,11 @@ class Game:
 
                     for mob in col.enemiesGenerated:
                         if pygame.sprite.collide_rect(mob, player):
-                            player.collideMob(mob)
-
+                            player.collideMob(mob, col.generatedWall)
                     for wall in col.generatedWall:
                         for mob in col.enemiesGenerated:
                             if pygame.sprite.collide_rect(mob, wall):
                                 mob.collideWall()
-
-                        if pygame.sprite.collide_rect(player, wall):
-                            return True
-
-                    for wall in col.generatedWall:
                         if pygame.sprite.collide_rect(player, wall):
                             return True
         return False
@@ -112,19 +115,19 @@ class Game:
 
     def updateMark(self):
 
-        if self.player.x - self.mark.getX() > self.player.screen.get_width() * 0.70 and not self.player.x > len(self.board.boardGrid[0]) * len(self.board.boardGrid) * config.TILESIZE - config.CANVASWIDTH :
+        if self.player.x - self.mark.getX() > self.player.screen.get_width() * 0.70 and not self.player.x > 17 * len(self.board.boardGrid) * config.TILESIZE - config.CANVASWIDTH - 64 :
             offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.70
             self.mark.x += offset
 
-        elif self.player.x - self.mark.getX() < self.player.screen.get_width() * 0.30 and not self.player.x < config.CANVASWIDTH :
+        elif self.player.x - self.mark.getX() < self.player.screen.get_width() * 0.30 and not self.player.x <= config.CANVASWIDTH * 0.30 + 17 :
             offset = self.player.x - self.mark.getX() - self.player.screen.get_width() * 0.30
             self.mark.x += offset
 
-        if self.player.y - self.mark.getY() < self.player.screen.get_height() * 0.30 and not self.player.y < config.CANVASHEIGHT:
+        if self.player.y - self.mark.getY() < self.player.screen.get_height() * 0.30 and not self.player.y <= config.CANVASHEIGHT * 0.30 - 17:
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.30
             self.player.mark.y += offset
 
-        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > len(self.board.boardGrid[0]) * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT:
+        elif self.player.y - self.mark.getY() > self.player.screen.get_height() * 0.7 and not self.player.y > 17 * len(self.board.boardGrid) * config.TILESIZE - config.CANVASHEIGHT - 64 :
             offset = self.player.y - self.mark.getY() - self.player.screen.get_height() * 0.70
             self.mark.y += offset
 

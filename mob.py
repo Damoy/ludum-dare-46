@@ -16,9 +16,11 @@ class Mob(sprites.GameSprite):
         self.dy = 0
         self.rect.x = x
         self.rect.y = y
+        self.stop = 0
         self.x = x
         self.y = y
         self.dv = 1
+        self.damage = 1
         self.damage = damage
         self.life = life
         self.spriteBank = spriteBank
@@ -55,8 +57,8 @@ class Mob(sprites.GameSprite):
         self.rect.x = self.x - self.mark.getX()
         self.rect.y = self.y - self.mark.getY()
 
-
     def updateDirection(self):
+
         self.updateDirectionTickCounter.update()
         started = self.updateDirectionTickCounter.hasStarted()
         ended = self.updateDirectionTickCounter.hasReachedEnd()
@@ -81,38 +83,44 @@ class Mob(sprites.GameSprite):
             self.updateDirectionTickCounter.restart()
 
     def move(self, oldDirs):
-        oldxdir = oldDirs["x"]
-        # oldydir = oldDirs["y"]
-        xdir = self.directions["x"]
-        ydir = self.directions["y"]
-        self.dx = 0
-        self.dy = 0
-        if xdir is not Direction.NONE:
-            if xdir == Direction.LEFT:
-                self.dx = -self.dv
-            if xdir == Direction.RIGHT:
-                self.dx = self.dv
-        if ydir is not Direction.NONE:
-            if ydir == Direction.UP:
-                self.dy = -self.dv
-            if ydir == Direction.DOWN:
-                self.dy = self.dv
+        if self.stop <= 0:
+            oldxdir = oldDirs["x"]
+            # oldydir = oldDirs["y"]
+            xdir = self.directions["x"]
+            ydir = self.directions["y"]
+            self.dx = 0
+            self.dy = 0
+            if xdir is not Direction.NONE:
+                if xdir == Direction.LEFT:
+                    self.dx = -self.dv
+                if xdir == Direction.RIGHT:
+                    self.dx = self.dv
+            if ydir is not Direction.NONE:
+                if ydir == Direction.UP:
+                    self.dy = -self.dv
+                if ydir == Direction.DOWN:
+                    self.dy = self.dv
+            if xdir != oldxdir:
+                if self.dx > 0:
+                    self.animation.setDirection(Direction.RIGHT)
+                elif self.dx < 0:
+                    self.animation.setDirection(Direction.LEFT)
+                self.image = self.animation.getCurrentFrame()
 
-        if xdir != oldxdir:
-            if self.dx > 0:
-                self.animation.setDirection(Direction.RIGHT)
-            elif self.dx < 0:
-                self.animation.setDirection(Direction.LEFT)
-            self.image = self.animation.getCurrentFrame()
+            self.pxMoveCount += max(abs(self.dx), abs(self.dy))
+            if self.pxMoveCount > config.TILESIZE:
+                self.pxMoveCount = 0
+                self.animation.update()
+                self.image = self.animation.getCurrentFrame()
 
-        self.pxMoveCount += max(abs(self.dx), abs(self.dy))
-        if self.pxMoveCount > config.TILESIZE:
-            self.pxMoveCount = 0
-            self.animation.update()
-            self.image = self.animation.getCurrentFrame()
+            self.x += self.dx
+            self.y += self.dy
 
-        self.x += self.dx
-        self.y += self.dy
+        else:
+            self.stop -= 1
+
+    def collidePlayer(self):
+        self.stop = config.FPS * 1.3
 
     def fixBounds(self, roomBounds):
         xstart = roomBounds[0]

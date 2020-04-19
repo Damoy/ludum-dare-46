@@ -15,6 +15,7 @@ class Adjacency(Enum):
     BOTTOM = 1
     LEFT = 2
     RIGHT = 3
+    ALL = 4
 
 
 class GameRoom:
@@ -53,7 +54,7 @@ class GameRoom:
         self.itemsGenerated = []
         self.itemsToDestroy = []
 
-        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM, Adjacency.LEFT, Adjacency.RIGHT]
+        self.adjacencies = [Adjacency.ALL]
 
         self.xStart = config.TILESIZE * size * column
         self.yStart = config.TILESIZE * size * line
@@ -121,9 +122,9 @@ class BasicRoom(GameRoom):
         self.buildItems()
 
     def buildMobs(self):
-        self.enemiesToGenerate[mob.Gobelin] = {"nb": 1, "proba": 0.25}
-        self.enemiesToGenerate[mob.Knight1] = {"nb": 1, "proba": 0.25}
-        self.enemiesToGenerate[mob.Skeleton] = {"nb": 1, "proba": 0.25}
+        self.enemiesToGenerate[mob.Gobelin] = 1
+        self.enemiesToGenerate[mob.Knight1] = 1
+        self.enemiesToGenerate[mob.Skeleton] = 1
 
     def buildItems(self):
         self.itemsToGenerate[item.Scroll] = {"nb": 1, "proba": 0.20, "content": "ZIZOU"}
@@ -168,7 +169,6 @@ class BasicRoom(GameRoom):
 
 
 class TreeRoom(GameRoom):
-    #Todo rename cette
     def __init__(self, textures: pygame.image,size, line, column, texts: text.Texts):
         GameRoom.__init__(self, textures,size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
@@ -233,7 +233,6 @@ class TreeRoom(GameRoom):
 
 
 class RuinedWildRoom(GameRoom):
-    # Todo rename cette
     def __init__(self, textures: pygame.image, size, line, column):
         GameRoom.__init__(self, textures, size, line, column)
         self.tilesToGenerate.append(tiles.GrassTile)
@@ -305,6 +304,8 @@ class CossWallRoom(GameRoom):
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
         self.nbWallToGenerate = 1
+        self.adjacencies = [Adjacency.RIGHT, Adjacency.LEFT, Adjacency.BOTTOM, Adjacency.TOP]
+        self.nbWallToGenerate = 1;
         self.buildMobs()
 
     def buildMobs(self):
@@ -395,7 +396,6 @@ class CossWallRoom(GameRoom):
         self.generatedWall.extend(self.fixedWalls)
 
 class HCorridorWallRoom(GameRoom):
-    # Todo rename cette
     def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts):
         GameRoom.__init__(self, textures, size, line, column, texts)
         self.tilesToGenerate.append(tiles.GrassTile)
@@ -505,7 +505,7 @@ class VCorridorWallRoom(GameRoom):
         self.tilesToGenerate.append(tiles.GrassTile)
         self.tilesToGenerate.append(tiles.FlowerGrassTile)
         self.wallsToGenerate.append((1, 1, tiles.WallTiles))
-        self.adjacencies = [Adjacency.RIGHT, Adjacency.LEFT]
+        self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM]
 
         self.nbWallToGenerate = 1;
         self.buildMobs()

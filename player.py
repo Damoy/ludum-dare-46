@@ -7,7 +7,6 @@ import config
 import gameTime
 import mark
 import math
-from pygame.rect import Rect
 
 class Attack:
     def __init__(self, x, y, w, h, color, screen, start, stop, mark: mark.Mark, dmg):
@@ -62,7 +61,9 @@ class Player(sprites.GameSprite):
                  spriteBank: dict, mark: mark, sounds):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
         self.screen = screen
+        self.isInvinsible = False
         self.mark = mark
+        self.invinsibleCounter = 0;
         self.rect.x = x
         self.rect.y = y
         self.x = x
@@ -114,8 +115,8 @@ class Player(sprites.GameSprite):
         # self.handleInput()
         self.handleAttack(mobsDico)
 
-        self.rect.x = self.x - self.mark.getX()
-        self.rect.y = self.y - self.mark.getY()
+        self.rect.x = int(self.x - self.mark.getX())
+        self.rect.y = int(self.y - self.mark.getY())
 
     def handleAttack(self, mobsDico):
         # attack arc circle
@@ -177,6 +178,7 @@ class Player(sprites.GameSprite):
         if keys[pygame.K_ESCAPE]:
             self.userEnded = True
             return
+
         self.move()
         self.attack()
 
@@ -199,71 +201,83 @@ class Player(sprites.GameSprite):
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 self.isAttacking = True
-                self.cdAttackTickCounter.stop()
+                # self.canAttack = False
+                # self.cdAttackTickCounter.restart()
 
 
     def move(self):
-        self.oldPos = ( self.x, self.y)
-        self.updateCdDashTickCounter()
-
-        if self.isDashing:
-            self.updateDash()
-        else:
-            self.dx = 0
-            self.dy = 0
-            dirX = Direction.NONE
-            dirY = Direction.NONE
-
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT]:
-                self.dx = -self.dv
-                dirX = Direction.LEFT
-                self.attackDirections["x"] = dirX
-            if keys[pygame.K_RIGHT]:
-                self.dx = self.dv
-                dirX = Direction.RIGHT
-                self.attackDirections["x"] = dirX
-            if keys[pygame.K_DOWN]:
-                self.dy = self.dv
-                dirY = Direction.DOWN
-                self.attackDirections["y"] = dirY
-            if keys[pygame.K_UP]:
-                self.dy = -self.dv
-                dirY = Direction.UP
-                self.attackDirections["y"] = dirY
-
-            dirXUpdated = self.directions["x"] is not dirX
-            dirYUpdated = self.directions["y"] is not dirY
-            dirUpdated = dirXUpdated or dirYUpdated
-
-            if dirXUpdated and not dirYUpdated:
-                self.attackDirections["y"] = Direction.NONE
-            if not dirXUpdated and dirYUpdated:
-                self.attackDirections["x"] = Direction.NONE
-
-            self.directions["x"] = dirX
-            self.directions["y"] = dirY
-
-            if keys[pygame.K_f] and (self.dx != 0 or self.dy != 0) and self.canDash:
-                self.isDashing = True
-                self.canDash = False
+        if not self.isInvinsible or self.invinsibleCounter < 60:
+            self.oldPos = (self.x, self.y)
+            self.updateCdDashTickCounter()
 
             if self.isDashing:
-                self.animation = self.dashAnimation
-                self.setAnimationDirection()
+                self.updateDash()
             else:
-                self.animation = self.walkAnimation
+                self.dx = 0
+                self.dy = 0
+                dirX = Direction.NONE
+                dirY = Direction.NONE
 
-            if not self.isDashing and self.dx != 0 or self.dy != 0:
-                self.pxMoveCount += max(abs(self.dx), abs(self.dy))
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_LEFT]:
+                    self.dx = -self.dv
+                    dirX = Direction.LEFT
+                    self.attackDirections["x"] = dirX
+                if keys[pygame.K_RIGHT]:
+                    self.dx = self.dv
+                    dirX = Direction.RIGHT
+                    self.attackDirections["x"] = dirX
+                if keys[pygame.K_DOWN]:
+                    self.dy = self.dv
+                    dirY = Direction.DOWN
+                    self.attackDirections["y"] = dirY
+                if keys[pygame.K_UP]:
+                    self.dy = -self.dv
+                    dirY = Direction.UP
+                    self.attackDirections["y"] = dirY
+
+                dirXUpdated = self.directions["x"] is not dirX
+                dirYUpdated = self.directions["y"] is not dirY
+                dirUpdated = dirXUpdated or dirYUpdated
+
+                if dirXUpdated and not dirYUpdated:
+                    self.attackDirections["y"] = Direction.NONE
+                if not dirXUpdated and dirYUpdated:
+                    self.attackDirections["x"] = Direction.NONE
+
+                self.directions["x"] = dirX
+                self.directions["y"] = dirY
+                if keys[pygame.K_f] and (self.dx != 0 or self.dy != 0) and self.canDash:
+                    self.isDashing = True
+                    self.canDash = False
+
+                if self.isDashing:
+                    self.animation = self.dashAnimation
+                    self.setAnimationDirection()
+                else:
+                    self.animation = self.walkAnimation
+
+                if not self.isDashing and self.dx != 0 or self.dy != 0:
+                    self.pxMoveCount += max(abs(self.dx), abs(self.dy))
+                    self.x += self.dx
+                    self.y += self.dy
+                    if dirUpdated:
+                        self.setAnimationDirection()
+                    elif self.pxMoveCount >= config.TILESIZE:
+                        self.pxMoveCount = 0
+                        self.updateAnimation()
+                self.invinsibleCounter -= 1
+                if self.invinsibleCounter == 0:
+                    self.isInvinsible = False
+        else:
+
+           # print(int(math.log(self.invinsibleCounter, 2)))
+            if self.invinsibleCounter % int(math.log(self.invinsibleCounter, 2)) == 0:
                 self.x += self.dx
                 self.y += self.dy
-                if dirUpdated:
-                    self.setAnimationDirection()
-                elif self.pxMoveCount >= config.TILESIZE:
-                    self.pxMoveCount = 0
-                    self.updateAnimation()
-
+            self.invinsibleCounter -= 1
+            if self.invinsibleCounter == 0:
+                self.isInvinsible = False
 
     def setAnimationDirection(self):
         if self.directions["y"] is Direction.NONE:
@@ -338,8 +352,37 @@ class Player(sprites.GameSprite):
             self.setAnimationDirection()
             self.pxMoveCount = 0
 
-    def collideMob(self, mob):
-        self.life -= mob.damage
-        # print("colision")
-        self.x -= self.dx
-        self.y -= self.dy
+    def makeInvinsible(self):
+        self.isInvinsible = True
+        self.invinsibleCounter = config.FPS * 1.3
+
+    def collideMob(self, mob, walls):
+
+        if not self.isInvinsible:
+            mob.dy = 0
+            mob.dx = 0
+            mob.collidePlayer()
+            self.makeInvinsible()
+            self.life -= mob.damage
+
+            if self.x + 2 > mob.x + mob.rect.width :
+                self.dx = 1.2
+            elif self.x + self.rect.width - 2 < mob.x :
+                self.dx = -1.2
+            else:
+                self.dx = 0
+
+
+            if self.y + self.rect.height - 2 < mob.y:
+                self.dy = -1.2
+                #print(self.dy)
+            elif mob.y + mob.rect.height < self.y + 3:
+                self.dy = 1.2
+            else:
+                self.dy = 0
+            #for wall in walls:
+            #    while pygame.sprite.collide_rect(self, wall):
+            #        pass
+        elif self.isInvinsible and self.invinsibleCounter < 60 :
+            self.x -= self.dx
+            self.y -= self.dy
