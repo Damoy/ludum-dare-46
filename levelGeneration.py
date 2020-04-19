@@ -43,8 +43,8 @@ class GameRoom:
         self.itemsToGenerate = {}
         self.enemies = sprites.GameSpriteGroup()
         self.enemiesGenerated = []
+        self.enemiesToDestroy = []
         self.items = []
-
 
         self.adjacencies = [Adjacency.TOP, Adjacency.BOTTOM, Adjacency.LEFT, Adjacency.RIGHT]
 
@@ -63,6 +63,8 @@ class GameRoom:
             self.tilesGroup.draw(window)
         if self.enemies:
             self.enemies.draw(window)
+            for enemy in self.enemiesGenerated:
+                enemy.render(window)
 
     def update(self):
         if self.tilesGroup:
@@ -119,6 +121,7 @@ class BasicRoom(GameRoom):
                 m = mobClass(x, y, self.enemies, spriteBank, mark, self.textures)
                 self.enemies.add(m)
                 self.enemiesGenerated.append(m)
+
 
 class TreeRoom(GameRoom):
     #Todo rename cette

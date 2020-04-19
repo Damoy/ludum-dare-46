@@ -9,7 +9,7 @@ import mark
 import math
 
 class Attack:
-    def __init__(self, x, y, w, h, color, screen, start, stop):
+    def __init__(self, x, y, w, h, color, screen, start, stop, mark: mark.Mark, dmg):
         self.x = x
         self.y = y
         self.w = w
@@ -19,20 +19,46 @@ class Attack:
         self.start = start
         self.stop = stop
         self.shouldRender = False
+        self.box = None
+        self.mark = mark
+        self.dmg = dmg
+
+    def collide(self, rect2: pygame.rect.Rect):
+        if self.box is None or rect2 is None:
+            return False
+        return self.box.colliderect(rect2)
 
     # collision todo
-    def update(self):
-        pass
+    def update(self, mobsDico: dict):
+        self.box = self.getBox()
+        for room in mobsDico:
+            mobsGenerated = mobsDico[room]['mobsGen']
+            # mobsToDestroy = mobsDico[room]['mobsDestroy']
+            for mob in mobsGenerated:
+                if self.collide(mob.getBox()):
+                    mob.life -= self.dmg
+                    if mob.life <= 0:
+                        mob.alive = False
+                        room.enemiesToDestroy.append(mob)
 
     def render(self):
         if self.shouldRender:
             pygame.draw.arc(self.screen, self.color,
-                [self.x, self.y, self.w, self.h], self.start, self.stop)
+                [self.x - self.mark.x, self.y - self.mark.y, self.w, self.h], self.start, self.stop)
+            # print("[", self.x, ",", self.y, ",", self.w, ",", self.h)
+            # pygame.draw.rect(self.screen, (255, 0, 0), pygame.rect.Rect(self.x - self.mark.x, self.y - self.mark.y, self.w, self.h))
             self.shouldRender = False
+            # print("treggfd:", "x:", self.x, ";y:", self.y, ";w:", self.w, ";h:", self.h, ";s:", self.start, ";stop:", self.stop)
+
+    def getBox(self):
+        box = pygame.rect.Rect(self.x, self.y, 16, 16)
+        # print("attack box:", box)
+        return box
+
 
 class Player(sprites.GameSprite):
     def __init__(self, screen: pygame.Surface, image: pygame.image, x, y, group: sprites.GameSpriteGroup,
-                 spriteBank: dict, mark: mark):
+                 spriteBank: dict, mark: mark, sounds):
         sprites.GameSprite.__init__(self, sprites.subImage(image, 0, 1, 14, 15), group)
         self.screen = screen
         self.isInvinsible = False
@@ -47,7 +73,7 @@ class Player(sprites.GameSprite):
         self.dy = 0;
         self.dvDash = self.dv * 3
         self.pxMoveCount = 0
-        self.directions = {"x": Direction.LEFT, "y": Direction.DOWN}
+        self.directions = {"x": Direction.NONE, "y": Direction.DOWN}
         self.walkAnimation = None
         self.dashAnimation = None
         self.loadAnimations(spriteBank)
@@ -60,64 +86,86 @@ class Player(sprites.GameSprite):
         self.life = 10
         self.isAttacking = False
         self.canAttack = True
-        self.cdAttackTickCounter = gameTime.TickCounter(config.FPS >> 2, False)
+        self.cdAttackTickCounter = gameTime.TickCounter(5, False)
+        self.damage = 1
         self.attackArcCircle = Attack(0, 0, config.TILESIZE, config.TILESIZE,
-                                      (255, 255, 255), self.screen, 0, 0)
+                                      (255, 255, 255), self.screen, 0, 0, self.mark, self.damage)
+        self.attackDirections = {"x": self.directions["x"], "y": self.directions["y"]}
+        self.updateHandleAttack()
         self.oldPos = (0, 0)
+        self.sounds = sounds
+
+    def getAttackBox(self):
+        if not self.isAttacking:
+            return None
+        return self.attackArcCircle.getBox()
 
     def render(self):
+        # image
+        self.screen.blit(self.image, (self.rect.x, self.rect.y))
+        # life
         w = self.life * config.TILESIZE >> 1
         h = config.TILESIZE >> 1
         pygame.draw.rect(self.screen, (30, 230, 30), pygame.Rect(10, 10, w, h))
+        # attack
         if self.attackArcCircle.shouldRender:
             self.attackArcCircle.render()
 
-    def update(self):
+    def update(self, mobsDico):
         # self.handleInput()
-        self.handleAttack()
+        self.handleAttack(mobsDico)
+
         self.rect.x = int(self.x - self.mark.getX())
         self.rect.y = int(self.y - self.mark.getY())
 
-    def handleAttack(self):
+    def handleAttack(self, mobsDico):
         # attack arc circle
+        self.updateCdAttackTickCounter()
         if self.isAttacking:
-            start = 0
-            stop = 0
-            xdir = self.directions["x"]
-            ydir = self.directions["y"]
-            x = 0
-            y = 0
-            if xdir is not Direction.NONE and ydir is not Direction.NONE:
-                if xdir == Direction.LEFT and ydir == Direction.UP:
-                    start = math.pi / 2
-                    stop = math.pi
-                elif xdir == Direction.LEFT and ydir == Direction.DOWN:
-                    start = math.pi
-                    stop = 3 * (math.pi / 2)
-                elif xdir == Direction.RIGHT and ydir == Direction.UP:
-                    start = 0
-                    stop = math.pi / 2
-                elif xdir == Direction.RIGHT and ydir == Direction.DOWN:
-                    start = 3 * (math.pi / 2)
-                    stop = 2 * math.pi
-                x = self.rect.x - 8 if xdir == Direction.LEFT else self.rect.x + 6
-                y = self.rect.y - 8 if ydir == Direction.UP else self.rect.y + 6
-            elif xdir is not Direction.NONE and ydir is Direction.NONE:
-                start = 3 * math.pi / 4 if xdir == Direction.LEFT else -math.pi / 4
-                stop = -3 * math.pi / 4 if xdir == Direction.LEFT else math.pi / 4
-                x = self.rect.x - 8 if xdir == Direction.LEFT else self.rect.x + 6
-                y = self.rect.y
-            elif xdir is Direction.NONE and ydir is not Direction.NONE:
-                start = math.pi / 4 if ydir == Direction.UP else 5 * math.pi / 4
-                stop = 3 * math.pi / 4 if ydir == Direction.UP else 7 * math.pi / 4
-                x = self.rect.x - 1
-                y = self.rect.y - 8 if ydir == Direction.UP else self.rect.y + 6
-            self.attackArcCircle.x = x
-            self.attackArcCircle.y = y
-            self.attackArcCircle.start = start
-            self.attackArcCircle.stop = stop
-            self.attackArcCircle.shouldRender = True
-            self.isAttacking = False
+            # self.sounds.playHitSound2()
+            self.updateHandleAttack()
+            self.attackArcCircle.update(mobsDico)
+
+    def updateHandleAttack(self):
+        start = self.attackArcCircle.start
+        stop = self.attackArcCircle.stop
+        xdir = self.attackDirections["x"]
+        ydir = self.attackDirections["y"]
+        x = self.attackArcCircle.x
+        y = self.attackArcCircle.y
+        if xdir is not Direction.NONE and ydir is not Direction.NONE:
+            if xdir == Direction.LEFT and ydir == Direction.UP:
+                start = math.pi / 2
+                stop = math.pi
+            elif xdir == Direction.LEFT and ydir == Direction.DOWN:
+                start = math.pi
+                stop = 3 * (math.pi / 2)
+            elif xdir == Direction.RIGHT and ydir == Direction.UP:
+                start = 0
+                stop = math.pi / 2
+            elif xdir == Direction.RIGHT and ydir == Direction.DOWN:
+                start = 3 * (math.pi / 2)
+                stop = 2 * math.pi
+            x = self.x - 16 if xdir == Direction.LEFT else self.x + 12
+            y = self.y - 16 if ydir == Direction.UP else self.y + 12
+        elif xdir is not Direction.NONE and ydir is Direction.NONE:
+            start = 3 * math.pi / 4 if xdir == Direction.LEFT else -math.pi / 4
+            stop = -3 * math.pi / 4 if xdir == Direction.LEFT else math.pi / 4
+            x = self.x - 16 if xdir == Direction.LEFT else self.x + 12
+            y = self.y
+        elif xdir is Direction.NONE and ydir is not Direction.NONE:
+            start = math.pi / 4 if ydir == Direction.UP else 5 * math.pi / 4
+            stop = 3 * math.pi / 4 if ydir == Direction.UP else 7 * math.pi / 4
+            x = self.x - 2
+            y = self.y - 16 if ydir == Direction.UP else self.y + 12
+        self.attackArcCircle.x = x
+        self.attackArcCircle.y = y
+        self.attackArcCircle.start = start
+        self.attackArcCircle.stop = stop
+        self.attackArcCircle.shouldRender = True
+        self.isAttacking = False
+        self.cdAttackTickCounter.restart()
+        self.canAttack = False
 
     def handleInput(self):
         for event in pygame.event.get():
@@ -149,11 +197,12 @@ class Player(sprites.GameSprite):
             self.cdAttackTickCounter.reset()
 
     def attack(self):
-        # self.updateCdAttackTickCounter()
-        if not self.isDashing and not self.isAttacking: # and self.canAttack:
+        if not self.isDashing and not self.isAttacking and self.canAttack:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE]:
                 self.isAttacking = True
+                # self.canAttack = False
+                # self.cdAttackTickCounter.restart()
 
 
     def move(self):
@@ -173,20 +222,31 @@ class Player(sprites.GameSprite):
                 if keys[pygame.K_LEFT]:
                     self.dx = -self.dv
                     dirX = Direction.LEFT
+                    self.attackDirections["x"] = dirX
                 if keys[pygame.K_RIGHT]:
                     self.dx = self.dv
                     dirX = Direction.RIGHT
+                    self.attackDirections["x"] = dirX
                 if keys[pygame.K_DOWN]:
                     self.dy = self.dv
                     dirY = Direction.DOWN
+                    self.attackDirections["y"] = dirY
                 if keys[pygame.K_UP]:
                     self.dy = -self.dv
                     dirY = Direction.UP
+                    self.attackDirections["y"] = dirY
 
-                dirUpdated = self.directions["x"] is not dirX or self.directions["y"] is not dirY
+                dirXUpdated = self.directions["x"] is not dirX
+                dirYUpdated = self.directions["y"] is not dirY
+                dirUpdated = dirXUpdated or dirYUpdated
+
+                if dirXUpdated and not dirYUpdated:
+                    self.attackDirections["y"] = Direction.NONE
+                if not dirXUpdated and dirYUpdated:
+                    self.attackDirections["x"] = Direction.NONE
+
                 self.directions["x"] = dirX
                 self.directions["y"] = dirY
-
                 if keys[pygame.K_f] and (self.dx != 0 or self.dy != 0) and self.canDash:
                     self.isDashing = True
                     self.canDash = False
@@ -281,11 +341,11 @@ class Player(sprites.GameSprite):
         self.pxMoveCount += max(abs(dx), abs(dy))
 
         # update dash animation
-        if self.pxMoveCount >= 16:
+        if self.pxMoveCount >= config.TILESIZE:
             self.updateAnimation()
 
         # end of dash
-        if self.pxMoveCount >= 48:
+        if self.pxMoveCount >= config.TILESIZE * 3:
             self.isDashing = False
             self.cdDashTickCounter.start()
             self.animation = self.walkAnimation
