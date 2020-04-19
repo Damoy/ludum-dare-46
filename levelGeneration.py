@@ -161,14 +161,6 @@ class BasicRoom(GameRoom):
         "color": (255, 255, 255),
         "player": self.player}
 
-    def generateTiles(self, loadedRessources: dict, mark : mark.Mark):
-        self.tilesGroup = sprites.GameSpriteGroup()
-        for x in range(self. size):
-            for y in range(self.size):
-                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](loadedRessources, self.tilesGroup, self.xStart + x * config.TILESIZE, self.yStart + y * config.TILESIZE, mark)
-                self.generatedTiles.append(tile)
-                self.tiles.append(tile)
-
     def generateMobs(self, spriteBank: dict, mark: mark.Mark):
         for mobClass in self.enemiesToGenerate:
             mobGenInfo = self.enemiesToGenerate[mobClass]
@@ -1028,7 +1020,7 @@ class TopRightBorder(GameRoom):
         self.buildMobs()
 
     def generateWalls(self, loadedRessources: dict, mark: mark.Mark):
-        print("x")
+        # print("x")
         for y in range(self.size):
             self.fixedWalls.append(
                 tiles.BorderTiles(loadedRessources, self.tilesGroup, self.xStart + (self.size - 1 ) * config.TILESIZE,
@@ -1190,3 +1182,71 @@ class BottomLeftBorder(GameRoom):
         self.generatedWall.extend(self.fixedWalls)
         print(self.generatedWall[1].rect.y)
         print(self.generatedWall[2].rect.y)
+
+# TODO
+class CastleCenterRoom(GameRoom):
+
+    def __init__(self, textures: pygame.image, size, line, column, texts: text.Texts, player):
+        GameRoom.__init__(self, textures, size, line, column, texts, player)
+        self.tilesToGenerate.append(tiles.GrassTile)
+        self.tilesToGenerate.append(tiles.FlowerGrassTile)
+        self.adjacencies = [Adjacency.LEFT, Adjacency.BOTTOM]
+        self.nbWallToGenerate = 0
+        self.buildMobs()
+
+    def generateTiles(self, spriteBank: dict, mark: mark.Mark):
+        self.tilesGroup = sprites.GameSpriteGroup()
+        for x in range(self.size):
+            for y in range(self.size):
+                tile = self.tilesToGenerate[randint(0, len(self.tilesToGenerate) - 1)](spriteBank,
+                                                                                       self.tilesGroup,
+                                                                                       self.xStart + x * config.TILESIZE,
+                                                                                       self.yStart + y * config.TILESIZE,
+                                                                                       mark)
+                self.generatedTiles.append(tile)
+                self.tiles.append(tile)
+
+    def generateWalls(self, spriteBank: dict, mark: mark.Mark):
+        for y in range(self.size):
+            self.fixedWalls.append(
+                tiles.BorderTiles(spriteBank, self.tilesGroup, self.xStart + (self.size - 1 ) * config.TILESIZE,
+                                  self.yStart + y * config.TILESIZE, mark))
+        for x in range(1, self.size):
+            self.fixedWalls.append(
+                tiles.BorderTiles(spriteBank, self.tilesGroup, self.xStart + x * config.TILESIZE,
+                                  self.yStart + 0 * config.TILESIZE, mark))
+
+        for x in range(self.nbWallToGenerate):
+            generated = False
+            tryb = 0
+            brutcap = 100
+            while not generated and tryb < brutcap:
+                tryb += 1
+                wallToGenerate = self.wallsToGenerate[randint(0, len(self.wallsToGenerate) - 1)]
+                generateCoordX = randint(2, len(self.physics) - 4)
+                generateCoordY = randint(2, len(self.physics) - 4)
+
+                # Check generation validity
+                if self.physics[generateCoordY][generateCoordX] == 0:
+                    ycheck = wallToGenerate[1];
+                    xcheck = wallToGenerate[0];
+                    res = True
+                    while ycheck >= 0:
+                        for x in range(xcheck):
+                            if self.physics[generateCoordY - ycheck][generateCoordX - x] == 1:
+                                res = False;
+                                break;
+                        ycheck -= 1;
+                    if res:
+                        ycheck = wallToGenerate[1];
+                        generated = True
+                        while ycheck >= 0:
+                            for x in range(xcheck):
+                                self.physics[generateCoordY - ycheck][generateCoordX - x] = 1
+                            ycheck -= 1
+                        tile = wallToGenerate[2](spriteBank, self.tilesGroup,
+                                                 self.xStart + generateCoordX * config.TILESIZE,
+                                                 self.yStart + generateCoordY * config.TILESIZE, mark)
+                        self.generatedWall.append(tile)
+                        self.tiles.append(tile)
+        self.generatedWall.extend(self.fixedWalls)
